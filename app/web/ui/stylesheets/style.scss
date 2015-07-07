@@ -11,7 +11,7 @@ a {
 
 .header {
   margin-top: 4rem;
-  margin-bottom: 10rem;
+  margin-bottom: 0;
   position: relative;
 
     h1 {
@@ -58,4 +58,16 @@ h4 {
 .container {
 /*  max-width: 800px;
 */  margin-bottom: 10rem;
+}
+
+#playlists {
+    .playlist-item {
+        width: 33%;
+        display: inline-block;
+    }
+}
+
+#player {
+    width: 100%;
+    height: 600px;
 }

@@ -16,7 +16,8 @@ YoutubeService.prototype.searchYoutube = function(query, callback) {
     };
     youtube.search.list(params, function(result, data) {
         // console.log(result, data.items[0].id.videoId);
-        if (data !== null && data !== undefined) {
+        if (data !== null && data !== undefined && data.items.length > 0) {
+            console.log(data.items[0].id);
             callback(data.items[0].id.videoId);
         }
     });

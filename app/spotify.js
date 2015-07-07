@@ -36,9 +36,12 @@ SpotifyService.prototype.getAuth = function(callback) {
 
 SpotifyService.prototype.getPlaylists = function() {
     var self = this;
-    console.log(self.app.locals.token);
+
+    var date = formatLocalDate();
+    console.log(date);
+
     var options = {
-        url: 'https://api.spotify.com/v1/browse/featured-playlists?country=US&limit=5',
+        url: 'https://api.spotify.com/v1/browse/featured-playlists?country=US&limit=20&timestamp=' + date,
         headers: {
             'Authorization': 'Bearer ' + self.app.locals.token
         },
@@ -91,9 +94,10 @@ SpotifyService.prototype.getTrackNames = function(playlists, i) {
                 // console.log(playlistData[i].tracks);
                 // playlistData[i].tracks.push(body.items[j].track.name);
                 var trackName = body.items[j].track.name;
+                var artistName = body.items[j].track.artists[0].name;
 
                 // Search Youtube for track by name.
-                self.youtubeService.searchYoutube(trackName, function(data) {
+                self.youtubeService.searchYoutube(trackName + ' ' + artistName, function(data) {
                     console.log(data);
                     if (data !== null && data !== undefined) {
                         self.app.locals.playlistData[i].tracks.push(data);
@@ -104,6 +108,24 @@ SpotifyService.prototype.getTrackNames = function(playlists, i) {
         }
 
     });
+}
+
+function formatLocalDate() {
+    var now = new Date(),
+        tzo = -now.getTimezoneOffset(),
+        dif = tzo >= 0 ? '+' : '-',
+        pad = function(num) {
+            var norm = Math.abs(Math.floor(num));
+            return (norm < 10 ? '0' : '') + norm;
+        };
+    return now.getFullYear()
+        + '-' + pad(now.getMonth()+1)
+        + '-' + pad(now.getDate())
+        + 'T' + pad(now.getHours())
+        + ':' + pad(now.getMinutes())
+        + ':' + pad(now.getSeconds())
+        + dif + pad(tzo / 60)
+        + ':' + pad(tzo % 60);
 }
 
 module.exports = SpotifyService;
