@@ -1,40 +1,41 @@
+var path = require('path');
 var express = require('express');
 var bodyParser = require('body-parser');
 var multer = require('multer');
 var morgan = require('morgan');
+var cookieParser = require('cookie-parser');
 
-var app = express();
-var config = require('../config')
+var config = require('../config');
 var routes = require('./api/routes');
-
+var web = require('./web/controllers/index');
 
 var request = require('request');
-var google = require('googleapis');
-var youtube = google.youtube('v3');
 
-var token;
-var playlistData = [];
+var app = express();
 
-// getAuth();
-// searchYoutube('in and out of love');
+app.locals.playlistData = [];
+
+// view engine setup
+app.set('views', path.join(__dirname, 'web/views'));
+app.set('view engine', 'hbs');
+//app.use(favicon(__dirname + '/public/favicon.ico'));
 
 // configure app
 app.use(morgan('dev')); // log requests to the console
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use(multer()); // for parsing multipart/form-data
+app.use(cookieParser());
+app.use(require('node-compass')({
+	mode: 'expanded',
+	project: path.join(__dirname, 'web/ui')
+}));
+app.use(express.static(path.join(__dirname, 'web/ui')));
 
-app.get('/', function (req, res) {
-    getAuth(function() {
-        getPlaylists();
-    })
-    // searchYoutube('in and out of love', function(data) {
-    //     res.json({data: data});
-    // });
-});
+app.use('/', web);
 
 app.get('/data', function (req, res) {
-    res.json({data: playlistData});
+    res.json({data: app.locals.playlistData});
 });
 
 // register api v1 routes
@@ -70,92 +71,3 @@ if (app.get('env') === 'development') {
 // });
 
 module.exports = app;
-
-function searchYoutube(query, callback) {
-    var params = {
-        part: 'snippet',
-        q: query,
-        key: config.googleApiKey
-    }
-    youtube.search.list(params, function(result, data) {
-        console.log(result, data.items[0].id.videoId);
-        callback(data.items[0].id.videoId);
-    });
-};
-
-function getAuth(callback) {
-    // Request Authorization Options.
-    var authOptions = {
-        url: 'https://accounts.spotify.com/api/token',
-        headers: {
-            'Authorization': 'Basic ' + (new Buffer(config.client_id + ':' + config.client_secret).toString('base64'))
-        },
-        form: {
-            grant_type: 'client_credentials'
-        },
-        json: true
-    };
-
-    // Request Authorization.
-    request.post(authOptions, function(error, response, body) {
-        if (!error && response.statusCode === 200) {
-
-            // Prepare Auth Bearer.
-            token = body.access_token;
-            callback();
-        }
-    });
-
-};
-
-function getPlaylists() {
-    var options = {
-        url: 'https://api.spotify.com/v1/browse/featured-playlists',
-        headers: {
-            'Authorization': 'Bearer ' + token
-        },
-        json: true
-    };
-
-    // Request featured-playlists.
-    request.get(options, function(error, response, body) {
-        var playlists = body.playlists.items;
-        getTracks(playlists);
-    });
-};
-
-function getTracks(playlists) {
-
-    for (var i = 0; i < playlists.length; i++) {
-
-        // Prepare request for each playlist resource.
-        var options = {
-            url: playlists[i].tracks.href,
-            headers: {
-                'Authorization': 'Bearer ' + token
-            },
-            json: true
-        };
-
-        // Request each playlist's tracks resource.
-        (function (i) {
-            request.get(options, function(error, response, body) {
-                // console.log('\n\n===================');
-                // console.log(playlists[i].name);
-                // console.log('===================\n');
-                playlistData.push({playlist: playlists[i].name, tracks: []});
-
-                for (var j = 0; j < body.items.length; j++) {
-                    // console.log(body.items[j].track.name);
-                    // playlistData[i].tracks.push(body.items[j].track.name);
-                    if (playlistData[i] !== undefined) {
-                        console.log(playlistData[i].tracks);
-                        playlistData[i].tracks.push(body.items[j].track.name);
-                    }
-
-                };
-
-            });
-        })(i);
-    };
-};

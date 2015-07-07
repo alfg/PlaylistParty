@@ -13,7 +13,8 @@
 
 // Import application and set port.
 var app = require('./app/app');
-var port = process.env.PORT || 3000; // set our port
+var config = require('./config');
+var port = process.env.PORT || config.port; // set our port
 
 // Start server.
 app.listen(port);
