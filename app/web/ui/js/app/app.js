@@ -50,14 +50,11 @@
 			},
 
             getPlaylists: function() {
-                console.log('getting playlists');
-
 				$.ajax({
 					url: _options.getPlaylistsApi,
 					dataType: 'json'
 				})
                 .done(function(data) {
-                    console.log(data);
                     _playlists = data;
                     _self.methods.renderPlaylists(data);
                 });
@@ -67,11 +64,10 @@
             clickPlaylist: function(e, el) {
                 var playlist = $(this).data('playlist');
                 _self.methods.loadPlaylist(playlist);
+				$('#player').slideDown();
             },
 
             loadPlaylist: function(playlistName) {
-                console.log('loading playlist', playlistName);
-
                 var playlist = _.find(_playlists.data, function(playlist) {
                     return playlist.playlist == playlistName
                 });
@@ -81,8 +77,6 @@
             },
 
             renderPlaylists: function(data) {
-                console.log('rendering playlists');
-
                 var playlistData = data.data;
 
                 $.ajax({
@@ -99,7 +93,6 @@
             },
 
 			player_Ready: function(e) {
-                console.log('ready');
 				// e.target.playVideo();
 			},
 
@@ -128,7 +121,7 @@
 						autoplay: 		0,
 						iv_load_policy: 3,
 						modestbranding: 0,
-						showinfo: 	1	
+						showinfo: 	1
 					},
 
 					events: {

@@ -8,12 +8,13 @@ var cookieParser = require('cookie-parser');
 var config = require('../config');
 var routes = require('./api/routes');
 var web = require('./web/controllers/index');
+var cache = require('./cache');
 
 var request = require('request');
 
 var app = express();
 
-app.locals.playlistData = [];
+// app.locals.playlistData = [];
 
 // view engine setup
 app.set('views', path.join(__dirname, 'web/views'));
@@ -35,7 +36,7 @@ app.use(express.static(path.join(__dirname, 'web/ui')));
 app.use('/', web);
 
 app.get('/data', function (req, res) {
-    res.json({data: app.locals.playlistData});
+    res.json({data: cache.playlistData});
 });
 
 // register api v1 routes

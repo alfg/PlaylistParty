@@ -1,11 +1,14 @@
 var config = require('../config');
+var cache = require('./cache');
 var request = require('request');
 var Youtube = require('./youtube');
 
 
-function SpotifyService(app) {
-    this.app = app;
-    this.youtubeService = new Youtube(app);
+function SpotifyService() {
+    // this.app = app;
+    this.youtubeService = new Youtube();
+    this.country = 'US';
+    this.limit = 40;
 }
 
 SpotifyService.prototype.getAuth = function(callback) {
@@ -28,7 +31,8 @@ SpotifyService.prototype.getAuth = function(callback) {
 
             // Prepare Auth Bearer.
             var token = body.access_token;
-            self.app.locals.token = token;
+            // self.app.locals.token = token;
+            cache.token = token;
             callback();
         }
     });
@@ -37,13 +41,19 @@ SpotifyService.prototype.getAuth = function(callback) {
 SpotifyService.prototype.getPlaylists = function() {
     var self = this;
 
+    cache.playlistData = []; // Empty playlists.
     var date = formatLocalDate();
-    console.log(date);
 
     var options = {
-        url: 'https://api.spotify.com/v1/browse/featured-playlists?country=US&limit=20&timestamp=' + date,
+        url: 'https://api.spotify.com/v1/browse/featured-playlists',
+        qs: {
+            country: self.country,
+            limit: self.limit,
+            timestamp: date
+        },
         headers: {
-            'Authorization': 'Bearer ' + self.app.locals.token
+            //'Authorization': 'Bearer ' + self.app.locals.token
+            'Authorization': 'Bearer ' + cache.token
         },
         json: true
     };
@@ -59,7 +69,7 @@ SpotifyService.prototype.getTracks = function(playlists) {
     var self = this;
 
     for (var i = 0; i < playlists.length; i++) {
-        self.app.locals.playlistData.push({
+        cache.playlistData.push({
             playlist: playlists[i].name,
             image: playlists[i].images[0].url,
             tracks: []});
@@ -77,22 +87,16 @@ SpotifyService.prototype.getTrackNames = function(playlists, i) {
     var options = {
         url: playlists[i].tracks.href,
         headers: {
-            'Authorization': 'Bearer ' + self.app.locals.token
+            'Authorization': 'Bearer ' + cache.token
         },
         json: true
     };
 
     request.get(options, function(error, response, body) {
-        // console.log('\n\n===================');
-        // console.log(playlists[i].name);
-        // console.log('===================\n');
 
         for (var j = 0; j < body.items.length; j++) {
-            // console.log(body.items[j].track.name);
-            // playlistData[i].tracks.push(body.items[j].track.name);
-            if (self.app.locals.playlistData[i] !== undefined) {
-                // console.log(playlistData[i].tracks);
-                // playlistData[i].tracks.push(body.items[j].track.name);
+            if (cache.playlistData[i] !== undefined) {
+
                 var trackName = body.items[j].track.name;
                 var artistName = body.items[j].track.artists[0].name;
 
@@ -100,7 +104,7 @@ SpotifyService.prototype.getTrackNames = function(playlists, i) {
                 self.youtubeService.searchYoutube(trackName + ' ' + artistName, function(data) {
                     console.log(data);
                     if (data !== null && data !== undefined) {
-                        self.app.locals.playlistData[i].tracks.push(data);
+                        cache.playlistData[i].tracks.push(data);
                     }
                 });
             }
@@ -121,7 +125,7 @@ function formatLocalDate() {
     return now.getFullYear()
         + '-' + pad(now.getMonth()+1)
         + '-' + pad(now.getDate())
-        + 'T' + pad(now.getHours())
+        + 'T' + pad(now.getHours() -3)
         + ':' + pad(now.getMinutes())
         + ':' + pad(now.getSeconds())
         + dif + pad(tzo / 60)
