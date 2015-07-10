@@ -129,7 +129,7 @@ function formatLocalDate() {
     return now.getFullYear()
         + '-' + pad(now.getMonth()+1)
         + '-' + pad(now.getDate())
-        + 'T' + pad(now.getHours() -3)
+        + 'T' + pad(now.getHours())
         + ':' + pad(now.getMinutes())
         + ':' + pad(now.getSeconds())
         + dif + pad(tzo / 60)
