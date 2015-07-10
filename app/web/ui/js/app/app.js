@@ -49,6 +49,19 @@
 
 			},
 
+			buildVideosArray: function(tracksArr) {
+				var videos = [];
+
+				for (var i = 0; i < tracksArr.length; i++) {
+
+					// Extract video ID from Youtube URL.
+					var v = tracksArr[i].id.videoId;
+					videos.push(v);
+				}
+
+				return videos;
+			},
+
             getPlaylists: function() {
 				$.ajax({
 					url: _options.getPlaylistsApi,
@@ -72,8 +85,12 @@
                     return playlist.playlist == playlistName
                 });
 
-				_player.loadPlaylist(playlist.tracks, 0, 5, _options.player.quality);
+				// Sort by video order from Spotify.
+				playlist = _.sortBy(playlist.tracks, function(o){ return o.order });
 
+				var videos = _self.methods.buildVideosArray(playlist);
+
+				_player.loadPlaylist(videos, 0, 5, _options.player.quality);
             },
 
             renderPlaylists: function(data) {

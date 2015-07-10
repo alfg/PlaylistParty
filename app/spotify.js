@@ -5,7 +5,6 @@ var Youtube = require('./youtube');
 
 
 function SpotifyService() {
-    // this.app = app;
     this.youtubeService = new Youtube();
     this.country = 'US';
     this.limit = 40;
@@ -13,6 +12,7 @@ function SpotifyService() {
 
 SpotifyService.prototype.getAuth = function(callback) {
     var self = this;
+
     // Request Authorization Options.
     var authOptions = {
         url: 'https://accounts.spotify.com/api/token',
@@ -76,11 +76,11 @@ SpotifyService.prototype.getTracks = function(playlists) {
 
 
         // Request each playlist's tracks resource.
-        self.getTrackNames(playlists, i);
+        self.getTrackData(playlists, i);
     }
 }
 
-SpotifyService.prototype.getTrackNames = function(playlists, i) {
+SpotifyService.prototype.getTrackData = function(playlists, i) {
     var self = this;
 
     // Prepare request for each playlist resource.
@@ -99,18 +99,22 @@ SpotifyService.prototype.getTrackNames = function(playlists, i) {
 
                 var trackName = body.items[j].track.name;
                 var artistName = body.items[j].track.artists[0].name;
+                var query = '{0} {1} {2}'
+                    .replace('{0}', trackName)
+                    .replace('{1}', artistName)
+                    .replace('{2}', 'video');
+
+                var order = j;
+
 
                 // Search Youtube for track by name.
-                self.youtubeService.searchYoutube(trackName + ' ' + artistName, function(data) {
-                    console.log(data);
+                self.youtubeService.searchYoutube(query, j, function(data) {
                     if (data !== null && data !== undefined) {
                         cache.playlistData[i].tracks.push(data);
                     }
                 });
             }
-
         }
-
     });
 }
 
