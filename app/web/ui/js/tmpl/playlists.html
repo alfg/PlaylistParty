@@ -1,8 +1,8 @@
 {{# _.each(data, function(i) { }}
 <a class="js-playlist four columns" href="#" data-playlist="{{ i.playlist }}">
     <div class="playlist-item">
-        <img src="{{ i.image }}" />
-        <h5>{{ i.playlist }}</h5>
+        <img src="{{ i.images[0].url }}" />
+        <h5>{{ i.name }}</h5>
     </div>
 </a>
 {{# }); }}

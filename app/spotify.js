@@ -38,7 +38,7 @@ SpotifyService.prototype.getAuth = function(callback) {
     });
 };
 
-SpotifyService.prototype.getPlaylists = function() {
+SpotifyService.prototype.getPlaylists = function(callback) {
     var self = this;
 
     cache.playlistData = []; // Empty playlists.
@@ -59,9 +59,81 @@ SpotifyService.prototype.getPlaylists = function() {
     };
 
     // Request featured-playlists.
-    request.get(options, function(error, response, body) {
-        var playlists = body.playlists.items;
-        self.getTracks(playlists);
+    self.getAuth(function() {
+        // Update auth token.
+        options.headers['Authorization'] = 'Bearer ' + cache.token;
+
+        request.get(options, function(error, response, body) {
+            var playlists = body.playlists.items;
+            callback(playlists);
+            // self.getTracks(playlists);
+        });
+    });
+}
+
+SpotifyService.prototype.getPlaylistById = function(user_id, playlist_id, callback) {
+    var self = this;
+
+    cache.playlistData = []; // Empty playlists.
+    var date = formatLocalDate();
+
+    var options = {
+        url: 'https://api.spotify.com/v1/users/{0}/playlists/{1}'
+            .replace('{0}', user_id).replace('{1}', playlist_id),
+        qs: {
+            country: self.country,
+            limit: self.limit,
+            timestamp: date
+        },
+        headers: {
+            //'Authorization': 'Bearer ' + self.app.locals.token
+            'Authorization': 'Bearer ' + cache.token
+        },
+        json: true
+    };
+
+    // Request featured-playlists.
+    self.getAuth(function() {
+        // Update auth token.
+        options.headers['Authorization'] = 'Bearer ' + cache.token;
+
+        request.get(options, function(error, response, body) {
+            var playlist = body;
+            callback(playlist);
+        });
+    });
+}
+
+SpotifyService.prototype.getPlaylistTracksById = function(user_id, playlist_id, callback) {
+    var self = this;
+
+    cache.playlistData = []; // Empty playlists.
+    var date = formatLocalDate();
+
+    var options = {
+        url: 'https://api.spotify.com/v1/users/{0}/playlists/{1}/tracks'
+            .replace('{0}', user_id).replace('{1}', playlist_id),
+        qs: {
+            country: self.country,
+            limit: self.limit,
+            timestamp: date
+        },
+        headers: {
+            //'Authorization': 'Bearer ' + self.app.locals.token
+            'Authorization': 'Bearer ' + cache.token
+        },
+        json: true
+    };
+
+    // Request featured-playlists.
+    self.getAuth(function() {
+        // Update auth token.
+        options.headers['Authorization'] = 'Bearer ' + cache.token;
+
+        request.get(options, function(error, response, body) {
+            var data = body;
+            callback(data);
+        });
     });
 }
 
