@@ -3,9 +3,10 @@ var config = require('../../config');
 var cache = require('../cache');
 var router = express.Router();
 
-var Spotify = require('../spotify');
+var NodeCache = require('node-cache');
+var myCache = new NodeCache();
 
-var playlistInterval = config.playlistInterval;
+var Spotify = require('../spotify');
 
 /**
  * Homepage demo.
@@ -37,28 +38,27 @@ router.get('/playlists/:user_id/:playlist_id', function(req, res) {
 router.get('/playlists/:user_id/:playlist_id/tracks', function(req, res) {
 	var user_id = req.params.user_id;
 	var playlist_id = req.params.playlist_id;
-	var spotifyService = new Spotify();
+	var cacheKey = 'playlist_tracks_' + user_id + playlist_id;
 
-    // Get playlists.
-    spotifyService.getPlaylistTracksById(user_id, playlist_id, function(data) {
-		spotifyService.getYoutubeVideos(data, function(data) {
-			res.json({data: data});
-		});
-	});
+	// TODO: Create caching service.
+	myCache.get(cacheKey, function(err, value) {
+		if (!err) {
+			if (value == undefined) {
+			    // Get playlists.
+				var spotifyService = new Spotify();
+			    spotifyService.getPlaylistTracksById(user_id, playlist_id, function(data) {
+					spotifyService.getYoutubeVideos(data, function(data) {
+						myCache.set(cacheKey, data, 15);
+						res.json({data: data});
+					});
+				});
+
+			} else {
+				res.json({data: value});
+			}
+		}
+	})
+
 });
-
-// Fetch playlists on app start and set interval to 1 hour.
-// setInterval(fetchPlaylists, playlistInterval);
-// fetchPlaylists();
-
-function fetchPlaylists() {
-	console.log("refreshing playlist data...");
-	var spotifyService = new Spotify();
-
-    // Auth before getting playlists.
-    spotifyService.getAuth(function() {
-        spotifyService.getPlaylists();
-    });
-}
 
 module.exports = router;

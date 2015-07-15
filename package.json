@@ -14,6 +14,7 @@
   "author": "Alf",
   "license": "MIT",
   "dependencies": {
+    "async": "^1.3.0",
     "body-parser": "^1.13.1",
     "cookie-parser": "^1.3.5",
     "express": "^4.13.0",
@@ -21,6 +22,7 @@
     "hbs": "^3.1.0",
     "morgan": "^1.6.1",
     "multer": "^0.1.8",
+    "node-cache": "^3.0.0",
     "node-compass": "^0.2.4",
     "request": "^2.58.0"
   }

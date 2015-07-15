@@ -1,4 +1,4 @@
 {
   "verbose": true,
-  "ignore": ["app/web/*"]
+  "ignore": ["app/web/*", "node_modules"]
 }

@@ -32,7 +32,6 @@ SpotifyService.prototype.getAuth = function(callback) {
 
             // Prepare Auth Bearer.
             var token = body.access_token;
-            // self.app.locals.token = token;
             cache.token = token;
             callback();
         }
@@ -74,7 +73,6 @@ SpotifyService.prototype.getPlaylists = function(callback) {
 SpotifyService.prototype.getPlaylistById = function(user_id, playlist_id, callback) {
     var self = this;
 
-    cache.playlistData = []; // Empty playlists.
     var date = formatLocalDate();
 
     var options = {
@@ -107,7 +105,6 @@ SpotifyService.prototype.getPlaylistById = function(user_id, playlist_id, callba
 SpotifyService.prototype.getPlaylistTracksById = function(user_id, playlist_id, callback) {
     var self = this;
 
-    cache.playlistData = []; // Empty playlists.
     var date = formatLocalDate();
 
     var options = {
@@ -160,58 +157,6 @@ SpotifyService.prototype.getYoutubeVideos = function(tracks, callback) {
             }
         });
     }
-}
-
-SpotifyService.prototype.getTracks = function(playlists) {
-    var self = this;
-
-    for (var i = 0; i < playlists.length; i++) {
-        cache.playlistData.push({
-            playlist: playlists[i].name,
-            image: playlists[i].images[0].url,
-            tracks: []});
-
-        // Request each playlist's tracks resource.
-        self.getTrackData(playlists, i);
-    }
-}
-
-SpotifyService.prototype.getTrackData = function(playlists, i) {
-    var self = this;
-
-    // Prepare request for each playlist resource.
-    var options = {
-        url: playlists[i].tracks.href,
-        headers: {
-            'Authorization': 'Bearer ' + cache.token
-        },
-        json: true
-    };
-
-    request.get(options, function(error, response, body) {
-
-        for (var j = 0; j < body.items.length; j++) {
-            if (cache.playlistData[i] !== undefined) {
-
-                var trackName = body.items[j].track.name;
-                var artistName = body.items[j].track.artists[0].name;
-                var query = '{0} {1} {2}'
-                    .replace('{0}', trackName)
-                    .replace('{1}', artistName)
-                    .replace('{2}', 'video');
-
-                var order = j;
-
-
-                // Search Youtube for track by name.
-                self.youtubeService.searchYoutube(query, j, function(data) {
-                    if (data !== null && data !== undefined) {
-                        cache.playlistData[i].tracks.push(data);
-                    }
-                });
-            }
-        }
-    });
 }
 
 function formatLocalDate() {
