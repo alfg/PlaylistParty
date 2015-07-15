@@ -7,7 +7,7 @@ var request = require('request');
 function YoutubeService() {
 }
 
-YoutubeService.prototype.searchYoutube = function(query, i, callback) {
+YoutubeService.prototype.searchYoutube = function(query, callback) {
     // See: https://developers.google.com/youtube/v3/docs/search/list
 
     var self = this;
@@ -22,8 +22,6 @@ YoutubeService.prototype.searchYoutube = function(query, i, callback) {
 
     youtube.search.list(params, function(result, data) {
         if (data !== null && data !== undefined && data.items.length > 0) {
-            console.log(data.items[0].id);
-            data.items[0].order = i;
             callback(data.items[0]);
         }
     });

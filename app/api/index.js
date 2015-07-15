@@ -41,7 +41,9 @@ router.get('/playlists/:user_id/:playlist_id/tracks', function(req, res) {
 
     // Get playlists.
     spotifyService.getPlaylistTracksById(user_id, playlist_id, function(data) {
-		res.json({data: data});
+		spotifyService.getYoutubeVideos(data, function(data) {
+			res.json({data: data});
+		});
 	});
 });
 

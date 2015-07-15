@@ -1,3 +1,4 @@
+var async = require('async');
 var config = require('../config');
 var cache = require('./cache');
 var request = require('request');
@@ -7,7 +8,7 @@ var Youtube = require('./youtube');
 function SpotifyService() {
     this.youtubeService = new Youtube();
     this.country = 'US';
-    this.limit = 40;
+    this.limit = 100;
 }
 
 SpotifyService.prototype.getAuth = function(callback) {
@@ -48,7 +49,7 @@ SpotifyService.prototype.getPlaylists = function(callback) {
         url: 'https://api.spotify.com/v1/browse/featured-playlists',
         qs: {
             country: self.country,
-            limit: self.limit,
+            limit: 50, // Featured playlists max.
             timestamp: date
         },
         headers: {
@@ -66,7 +67,6 @@ SpotifyService.prototype.getPlaylists = function(callback) {
         request.get(options, function(error, response, body) {
             var playlists = body.playlists.items;
             callback(playlists);
-            // self.getTracks(playlists);
         });
     });
 }
@@ -137,6 +137,31 @@ SpotifyService.prototype.getPlaylistTracksById = function(user_id, playlist_id, 
     });
 }
 
+SpotifyService.prototype.getYoutubeVideos = function(tracks, callback) {
+    var self = this;
+
+    async.map(tracks.items, getTrack, function(err, results) {
+        callback(tracks);
+    });
+
+    function getTrack(item, callback) {
+        var trackName = item.track.name;
+        var artistName = item.track.artists[0].name;
+        var query = '{0} {1} {2}'
+            .replace('{0}', trackName)
+            .replace('{1}', artistName)
+            .replace('{2}', 'video');
+
+        // Search Youtube for track by name.
+        self.youtubeService.searchYoutube(query, function(data) {
+            if (data !== null && data !== undefined) {
+                item.track.external_ids['youtube'] = data.id.videoId;
+                callback();
+            }
+        });
+    }
+}
+
 SpotifyService.prototype.getTracks = function(playlists) {
     var self = this;
 
@@ -145,7 +170,6 @@ SpotifyService.prototype.getTracks = function(playlists) {
             playlist: playlists[i].name,
             image: playlists[i].images[0].url,
             tracks: []});
-
 
         // Request each playlist's tracks resource.
         self.getTrackData(playlists, i);

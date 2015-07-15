@@ -6,17 +6,12 @@
 		var _self = this;
 
 		var _defaults = {
-			animConfig: {
-				duration: 800,
-				easing: 'easeInOutQuint',
-				queue: false
-			},
 			player: {
 				quality: 'hd720',
 				autohide: 1
 			},
-
             getPlaylistsApi: '/api/playlists',
+            getPlaylistTracksByIdApi: '/api/playlists/{0}/{1}/tracks',
             playlistTemplate: '/js/tmpl/playlists.html'
 		};
 
@@ -50,12 +45,12 @@
 			},
 
 			buildVideosArray: function(tracksArr) {
+				var tracks = tracksArr.data.items;
 				var videos = [];
 
-				for (var i = 0; i < tracksArr.length; i++) {
+				for (var i = 0; i < tracks.length; i++) {
 
-					// Extract video ID from Youtube URL.
-					var v = tracksArr[i].id.videoId;
+					var v = tracks[i].track.external_ids.youtube;
 					videos.push(v);
 				}
 
@@ -81,16 +76,22 @@
             },
 
             loadPlaylist: function(playlistName) {
-                var playlist = _.find(_playlists.data, function(playlist) {
-                    return playlist.playlist == playlistName
+                var playlist = _.find(_playlists.data, function(p) {
+                    return p.name == playlistName
                 });
 
-				// Sort by video order from Spotify.
-				playlist = _.sortBy(playlist.tracks, function(o){ return o.order });
+				var url = _options.getPlaylistTracksByIdApi
+					.replace('{0}', playlist.owner.id)
+					.replace('{1}', playlist.id)
 
-				var videos = _self.methods.buildVideosArray(playlist);
-
-				_player.loadPlaylist(videos, 0, 5, _options.player.quality);
+				$.ajax({
+					url: url,
+					dataType: 'json'
+				})
+                .done(function(data) {
+					var videos = _self.methods.buildVideosArray(data);
+					_player.loadPlaylist(videos, 0, 5, _options.player.quality);
+                });
             },
 
             renderPlaylists: function(data) {
