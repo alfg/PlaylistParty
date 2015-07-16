@@ -38,10 +38,9 @@ SpotifyService.prototype.getAuth = function(callback) {
     });
 };
 
-SpotifyService.prototype.getPlaylists = function(callback) {
+SpotifyService.prototype.getFeaturedPlaylists = function(callback) {
     var self = this;
 
-    cache.playlistData = []; // Empty playlists.
     var date = formatLocalDate();
 
     var options = {
