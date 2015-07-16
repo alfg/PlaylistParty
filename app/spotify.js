@@ -140,7 +140,15 @@ SpotifyService.prototype.getYoutubeVideos = function(tracks, callback) {
         callback(tracks);
     });
 
-    function getTrack(item, callback) {
+    function getTrack(item, cb) {
+
+        // TODO
+        // if (item.track.duration_ms < 5000) {
+        //     console.log('we should remove this');
+        //     callback(null, null);
+        // }
+
+
         var trackName = item.track.name;
         var artistName = item.track.artists[0].name;
         var query = '{0} {1} {2}'
@@ -152,7 +160,9 @@ SpotifyService.prototype.getYoutubeVideos = function(tracks, callback) {
         self.youtubeService.searchYoutube(query, function(data) {
             if (data !== null && data !== undefined) {
                 item.track.external_ids['youtube'] = data.id.videoId;
-                callback();
+                cb();
+            } else {
+                cb();
             }
         });
     }
