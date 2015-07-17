@@ -108,7 +108,7 @@ SpotifyService.prototype.getPlaylistTracksById = function(user_id, playlist_id, 
 
     var options = {
         url: 'https://api.spotify.com/v1/users/{0}/playlists/{1}/tracks'
-            .replace('{0}', user_id).replace('{1}', playlist_id),
+            .replace('{0}', encodeURIComponent(user_id)).replace('{1}', playlist_id),
         qs: {
             country: self.country,
             limit: self.limit,

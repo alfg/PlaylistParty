@@ -14,8 +14,6 @@ var request = require('request');
 
 var app = express();
 
-// app.locals.playlistData = [];
-
 // view engine setup
 app.set('views', path.join(__dirname, 'web/views'));
 app.set('view engine', 'hbs');
@@ -27,17 +25,9 @@ app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use(multer()); // for parsing multipart/form-data
 app.use(cookieParser());
-app.use(require('node-compass')({
-	mode: 'expanded',
-	project: path.join(__dirname, 'web/ui')
-}));
-app.use(express.static(path.join(__dirname, 'web/ui')));
+app.use(express.static(path.join(__dirname, 'web/dist')));
 
 app.use('/', web);
-
-app.get('/data', function (req, res) {
-    res.json({data: cache.playlistData});
-});
 
 // register api v1 routes
 app.use('/api', routes.index);
