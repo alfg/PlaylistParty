@@ -3,8 +3,6 @@ import _ from 'lodash';
 
 export default function home() {
 
-    console.log('foo');
-
     ;(function($) {
 
     	// Plugin constructor with options and methods
