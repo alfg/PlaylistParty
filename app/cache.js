@@ -25,6 +25,29 @@ var cache = {
     			}
     		}
     	});
+    },
+
+    get: function(cacheKey, callback) {
+    	myCache.get(cacheKey, function(err, value) {
+    		if (!err) {
+    			if (value == undefined) {
+                    callback(value);
+    			} else {
+                    callback(value);
+    			}
+    		}
+    	});
+    },
+
+    set: function(cacheKey, timeout, fn, callback) {
+        fn(function(data) {
+		    myCache.set(cacheKey, data, timeout, function(err, success) {
+                if (!err && success) {
+                    callback(data);
+                }
+                callback();
+            });
+        });
     }
 }
 

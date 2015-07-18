@@ -31,6 +31,16 @@ router.get('/playlists', function(req, res) {
 	}
 });
 
+router.get('/playlists/:user_id', function(req, res) {
+	var user_id = req.params.user_id;
+
+    // Get user playlists.
+	var spotifyService = new Spotify();
+    spotifyService.getUserPlaylists(user_id, function(data) {
+		res.json({data: data});
+	});
+});
+
 router.get('/playlists/:user_id/:playlist_id', function(req, res) {
 	var user_id = req.params.user_id;
 	var playlist_id = req.params.playlist_id;

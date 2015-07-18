@@ -1,8 +1,8 @@
 import PlaylistPlayer from '../services/playlistPlayer';
 
-export default function HomeController() {
+export default function UserController(user) {
 
     var player = new PlaylistPlayer();
-    player.getFeaturedPlaylists();
+    player.getUserPlaylists(user);
 
 };

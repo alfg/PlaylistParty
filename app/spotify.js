@@ -133,6 +133,37 @@ SpotifyService.prototype.getPlaylistTracksById = function(user_id, playlist_id, 
     });
 }
 
+SpotifyService.prototype.getUserPlaylists = function(user_id, callback) {
+    var self = this;
+
+    var date = formatLocalDate();
+
+    var options = {
+        url: 'https://api.spotify.com/v1/users/{0}/playlists'
+            .replace('{0}', encodeURIComponent(user_id)),
+        qs: {
+            country: self.country,
+            limit: 50, // Max playlists per user limit.
+            timestamp: date
+        },
+        headers: {
+            'Authorization': 'Bearer ' + cache.token
+        },
+        json: true
+    };
+
+    // Request featured-playlists.
+    self.getAuth(function() {
+        // Update auth token.
+        options.headers['Authorization'] = 'Bearer ' + cache.token;
+
+        request.get(options, function(error, response, body) {
+            var playlists = body.items;
+            callback(playlists);
+        });
+    });
+}
+
 SpotifyService.prototype.getYoutubeVideos = function(tracks, callback) {
     var self = this;
 

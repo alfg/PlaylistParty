@@ -3,12 +3,15 @@ import Backbone from 'backbone';
 
 import HelloView from './views/hello';
 import Home from './controllers/home';
+import User from './controllers/user';
 
 
 export default Backbone.Router.extend({
 
   routes: {
     '': Home,
+    'featured-playlists': Home,
+    'playlist/:user': User,
     'about': 'about'
   },
 
