@@ -1,14 +1,13 @@
 import $ from 'jquery';
 import _ from 'lodash';
 
-// Underscore JS
+// Underscore JS settings.
 // @see http://underscorejs.org
 _.templateSettings = {
 	evaluate: 		/\{\{#([\s\S]+?)\}\}/g, 			// {{# console.log("blah") }}
 	interpolate: 	/\{\{[^#\{]([\s\S]+?)[^\}]\}\}/g, 	// {{ title }}
 	escape: 		/\{\{\{([\s\S]+?)\}\}\}/g, 			// {{{ title }}}
 }
-
 
 export default class PlaylistPlayer {
         constructor(options) {
@@ -68,8 +67,7 @@ export default class PlaylistPlayer {
             var self = this;
 
 			$.ajax({
-				url: self._options.getUserPlaylistsApi
-    				.replace('{0}', user),
+				url: String.format(self._options.getUserPlaylistsApi, user),
 				dataType: 'json'
 			})
             .done(function(data) {
@@ -86,7 +84,8 @@ export default class PlaylistPlayer {
 
             var playlist = $(el).data('playlist');
             self.loadPlaylist(playlist);
-			$('#player').slideDown();
+			$('.js-spinner').text('Loading...');
+			window.scrollTo(0, 0);
         }
 
         loadPlaylist(playlistName) {
@@ -96,9 +95,8 @@ export default class PlaylistPlayer {
                 return p.name == playlistName
             });
 
-			var url = self._options.getPlaylistTracksByIdApi
-				.replace('{0}', playlist.owner.id)
-				.replace('{1}', playlist.id)
+			var url = String.format(self._options.getPlaylistTracksByIdApi,
+                playlist.owner.id, playlist.id);
 
 			$.ajax({
 				url: url,
@@ -107,6 +105,8 @@ export default class PlaylistPlayer {
             .done(function(data) {
 				var videos = self.buildVideosArray(data);
 				self._player.loadPlaylist(videos, 0, 5, self._options.player.quality);
+				$('.js-spinner').empty();
+				$('#player').slideDown();
             });
         }
 
