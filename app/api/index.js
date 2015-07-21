@@ -12,6 +12,44 @@ router.get('/', function(req, res) {
 	res.json({ data: 'Hello World!'});
 });
 
+router.get('/categories', function(req, res) {
+
+	var cacheKey = 'categories';
+	var timeout = 60 * 15; // 15 minutes.
+
+	cache.getOrSet(cacheKey, timeout, getCategories, function(data) {
+		res.json({data: data});
+	});
+
+	// Cache function.
+	function getCategories(callback) {
+	    // Get playlists.
+		var spotifyService = new Spotify();
+	    spotifyService.getCategories(function(data) {
+            callback(data);
+		});
+	}
+});
+
+router.get('/categories/:id', function(req, res) {
+	var id = req.params.id;
+	var cacheKey = 'category_playlist_' + id;
+	var timeout = 60 * 60 * 4; // 4 hours.
+
+	cache.getOrSet(cacheKey, timeout, getCategoryPlaylist, function(data) {
+		res.json({data: data});
+	});
+
+	// Cache function.
+	function getCategoryPlaylist(callback) {
+	    // Get playlists tracks with Youtube IDs.
+		var spotifyService = new Spotify();
+	    spotifyService.getCategoryPlaylist(id, function(data) {
+            callback(data);
+		});
+	}
+});
+
 router.get('/playlists', function(req, res) {
 
 	var cacheKey = 'featured_playlists';
@@ -26,6 +64,25 @@ router.get('/playlists', function(req, res) {
 	    // Get playlists.
 		var spotifyService = new Spotify();
 	    spotifyService.getFeaturedPlaylists(function(data) {
+            callback(data);
+		});
+	}
+});
+
+router.get('/new-releases', function(req, res) {
+
+	var cacheKey = 'new_releases';
+	var timeout = 60 * 15; // 15 minutes.
+
+	cache.getOrSet(cacheKey, timeout, getNewReleases, function(data) {
+		res.json({data: data});
+	});
+
+	// Cache function.
+	function getNewReleases(callback) {
+	    // Get playlists.
+		var spotifyService = new Spotify();
+	    spotifyService.getNewReleases(function(data) {
             callback(data);
 		});
 	}

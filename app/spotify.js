@@ -69,6 +69,90 @@ SpotifyService.prototype.getFeaturedPlaylists = function(callback) {
     });
 }
 
+SpotifyService.prototype.getNewReleases = function(callback) {
+    var self = this;
+
+    var date = formatLocalDate();
+
+    var options = {
+        url: 'https://api.spotify.com/v1/browse/new-releases',
+        qs: {
+            country: self.country,
+            limit: 50 // New releases max.
+        },
+        headers: {
+            'Authorization': 'Bearer ' + cache.token
+        },
+        json: true
+    };
+
+    // Request featured-playlists.
+    self.getAuth(function() {
+        // Update auth token.
+        options.headers['Authorization'] = 'Bearer ' + cache.token;
+
+        request.get(options, function(error, response, body) {
+            var albums = body.albums.items;
+            callback(albums);
+        });
+    });
+}
+
+SpotifyService.prototype.getCategories = function(callback) {
+    var self = this;
+
+    var options = {
+        url: 'https://api.spotify.com/v1/browse/categories',
+        qs: {
+            country: self.country,
+            limit: 50 // New releases max.
+        },
+        headers: {
+            'Authorization': 'Bearer ' + cache.token
+        },
+        json: true
+    };
+
+    // Request featured-playlists.
+    self.getAuth(function() {
+        // Update auth token.
+        options.headers['Authorization'] = 'Bearer ' + cache.token;
+
+        request.get(options, function(error, response, body) {
+            var categories = body.categories.items;
+            callback(categories);
+        });
+    });
+}
+
+SpotifyService.prototype.getCategoryPlaylist = function(category_id, callback) {
+    var self = this;
+
+    var options = {
+        url: 'https://api.spotify.com/v1/browse/categories/{0}/playlists'
+            .replace('{0}', category_id),
+        qs: {
+            country: self.country,
+            limit: 50 // Categories Playlist max.
+        },
+        headers: {
+            'Authorization': 'Bearer ' + cache.token
+        },
+        json: true
+    };
+
+    // Request featured-playlists.
+    self.getAuth(function() {
+        // Update auth token.
+        options.headers['Authorization'] = 'Bearer ' + cache.token;
+
+        request.get(options, function(error, response, body) {
+            var playlists = body.playlists.items;
+            callback(playlists);
+        });
+    });
+}
+
 SpotifyService.prototype.getPlaylistById = function(user_id, playlist_id, callback) {
     var self = this;
 

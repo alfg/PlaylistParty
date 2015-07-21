@@ -1,12 +1,19 @@
 <div id="content" class="container">
     <section class="header">
-        <div class="logo">Spotlist<span class="tv">TV</span></div>
-        <span class="desc">
-            Play Spotify playlists on Youtube.
-        </span>
+        <div class="row">
+            <div class="four columns">
+            <div class="logo"><a href="/#">Spotlist<span class="tv">TV</span></a></div>
+                <span class="desc">
+                    Play Spotify playlists on Youtube.
+                </span>
+            </div>
+            <div class="navigation four columns">
+                <a class="nav-item" href="#/featured-playlists">Featured</a>
+                <a class="nav-item" href="#/categories">Categories</a>
+            </div>
+        </div>
     </section>
     <hr />
-
 
     <section>
         <div id="player"></div>
@@ -14,12 +21,12 @@
     </section>
 
     <section>
-        <h5>Featured Playlists</h5>
+        <h4 id="playlist-title"></h4>
         <div id="playlists"></div>
     </section>
 
-    <footer>
-        Spotlist.TV is not affiliated with Spotify or Youtube.
-    </footer>
-
 </div>
+
+<footer>
+    Spotlist.TV is not affiliated with Spotify or Youtube.
+</footer>

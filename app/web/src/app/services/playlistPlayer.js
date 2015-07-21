@@ -18,18 +18,24 @@ export default class PlaylistPlayer {
     				quality: 'hd720',
     				autohide: 1
     			},
+                getCategoriesApi: '/api/categories',
+                getCategoryByIdApi: '/api/categories/{0}',
                 getPlaylistsApi: '/api/playlists',
+                getNewReleasesApi: '/api/new-releases',
                 getUserPlaylistsApi: '/api/playlists/{0}',
                 getPlaylistTracksByIdApi: '/api/playlists/{0}/{1}/tracks',
-                playlistTemplate: '/static/tmpl/playlists.html'
+
+                playlistTemplate: '/static/tmpl/playlists.html',
+                categoriesTemplate: '/static/tmpl/categories.html'
     		};
 
     		this._options = $.extend(true, {}, this._defaults, options);
 
-    		this._player = null;
+    		this._player = window._player; // Attach to window to persist session.
             this._playlists = null;
+            this._categories = null;
 
-            this.youTubeLoadPlayer();
+            this.youTubeLoadPlayer(); // Loads Youtube iFrame Player.
         }
 
         init() {
@@ -60,7 +66,32 @@ export default class PlaylistPlayer {
                 self._playlists = data;
                 self.renderPlaylists(data);
             });
+        }
 
+        getCategories() {
+            var self = this;
+
+			$.ajax({
+				url: self._options.getCategoriesApi,
+				dataType: 'json'
+			})
+            .done(function(data) {
+                self._categories = data;
+                self.renderCategories(data);
+            });
+        }
+
+        getCategoryById(category) {
+            var self = this;
+
+			$.ajax({
+				url: String.format(self._options.getCategoryByIdApi, category),
+				dataType: 'json'
+			})
+            .done(function(data) {
+                self._playlists = data;
+                self.renderPlaylists(data);
+            });
         }
 
         getUserPlaylists(user) {
@@ -90,6 +121,7 @@ export default class PlaylistPlayer {
 
         loadPlaylist(playlistName) {
             var self = this;
+			console.log(this._player);
 
             var playlist = _.find(self._playlists.data, function(p) {
                 return p.name == playlistName
@@ -127,6 +159,22 @@ export default class PlaylistPlayer {
             });
         }
 
+        renderCategories(data) {
+            var self = this;
+            var categoriesData = data.data;
+
+            $.ajax({
+                url: self._options.categoriesTemplate,
+                dataType: 'html'
+            })
+            .done(function(tmpl) {
+
+				var categoriesTmpl = _.template(tmpl);
+
+				$('#playlists').html(categoriesTmpl({data: categoriesData}));
+            });
+        }
+
 		player_Ready(e) {
 			// e.target.playVideo();
 		}
@@ -150,7 +198,7 @@ export default class PlaylistPlayer {
 
 		youTube_IframeAPIReady(options) {
 
-			this._player = new YT.Player('player', {
+			window._player = new YT.Player('player', {
 
 				playerVars: {
 					autohide: 		options.player.autohide,
