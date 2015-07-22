@@ -25,6 +25,7 @@ export default class PlaylistPlayer {
                 getUserPlaylistsApi: '/api/playlists/{0}',
                 getPlaylistTracksByIdApi: '/api/playlists/{0}/{1}/tracks',
 
+                userPlaylistTemplate: '/static/tmpl/userPlaylist.html',
                 playlistTemplate: '/static/tmpl/playlists.html',
                 categoriesTemplate: '/static/tmpl/categories.html'
     		};
@@ -58,6 +59,8 @@ export default class PlaylistPlayer {
         getFeaturedPlaylists() {
             var self = this;
 
+			$('#playlists').removeClass('show');
+
 			$.ajax({
 				url: self._options.getPlaylistsApi,
 				dataType: 'json'
@@ -70,6 +73,8 @@ export default class PlaylistPlayer {
 
         getCategories() {
             var self = this;
+
+			$('#playlists').removeClass('show');
 
 			$.ajax({
 				url: self._options.getCategoriesApi,
@@ -84,6 +89,8 @@ export default class PlaylistPlayer {
         getCategoryById(category) {
             var self = this;
 
+			$('#playlists').removeClass('show');
+
 			$.ajax({
 				url: String.format(self._options.getCategoryByIdApi, category),
 				dataType: 'json'
@@ -96,6 +103,8 @@ export default class PlaylistPlayer {
 
         getUserPlaylists(user) {
             var self = this;
+
+			$('#playlists').removeClass('show');
 
 			$.ajax({
 				url: String.format(self._options.getUserPlaylistsApi, user),
@@ -154,8 +163,34 @@ export default class PlaylistPlayer {
 
 				var playlistTmpl = _.template(tmpl);
 
-				$('#playlists').html(playlistTmpl({data: playlistData}));
+				$('#playlists')
+					.html(playlistTmpl({data: playlistData}))
+					.addClass('show');
                 $('.js-playlist').on('click', function(e, el) { self.clickPlaylist(e, this) });
+            });
+        }
+
+        renderUserPlaylist() {
+            var self = this;
+
+            $.ajax({
+                url: self._options.userPlaylistTemplate,
+                dataType: 'html'
+            })
+            .done(function(tmpl) {
+
+				var userPlaylistTmpl = _.template(tmpl);
+
+				$('#playlists')
+					.html(userPlaylistTmpl)
+					.addClass('show');
+
+				$('#user-form').on('submit', function(e) {
+					e.preventDefault();
+
+					var user = $('#user-input').val();
+					window.location.hash = `/playlist/${user}`;
+				});
             });
         }
 
@@ -171,7 +206,9 @@ export default class PlaylistPlayer {
 
 				var categoriesTmpl = _.template(tmpl);
 
-				$('#playlists').html(categoriesTmpl({data: categoriesData}));
+				$('#playlists')
+					.html(categoriesTmpl({data: categoriesData}))
+					.addClass('show');
             });
         }
 

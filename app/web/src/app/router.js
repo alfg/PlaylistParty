@@ -2,55 +2,67 @@ import $ from 'jquery';
 import Backbone from 'backbone';
 
 import PlaylistPlayer from './services/playlistPlayer';
-import HelloView from './views/hello';
 import Home from './controllers/home';
-import User from './controllers/user';
+import Playlist from './controllers/playlist';
 
 
 export default Backbone.Router.extend({
 
-  routes: {
-    '': Home,
-    'featured-playlists': Home,
-    'categories': 'categories',
-    'categories/:category': 'category',
-    'playlist/:user': User,
-    'about': 'about'
-  },
+    routes: {
+        '': 'home',
+        'featured-playlists': 'home',
+        'playlist': 'playlist',
+        'playlist/:user': 'userPlaylist',
+        'categories': 'categories',
+        'categories/:category': 'category',
+        'about': 'about'
+    },
 
-  initialize: () => {
-    $('body').append('<div id="js-app"></div>');
-  },
+    initialize: () => {
+        $('#content').append('<div id="js-app"></div>');
+    },
 
-  home: () => {
-    var helloView = new HelloView({
-      template: _.template('Hello <%= name %> !')
-    }).render();
+    home: () => {
+        var player = new PlaylistPlayer();
+        player.getFeaturedPlaylists();
 
-    $('#js-app').empty().append(helloView.$el);
+        $('#playlist-title').empty().text('Featured Playlists');
+    },
 
-},
+    categories: () => {
+        var player = new PlaylistPlayer();
+        player.getCategories();
 
-categories: () => {
-    var player = new PlaylistPlayer();
-    player.getCategories();
+        $('#playlist-title').empty().text('Categories');
+    },
 
-    $('#playlist-title').empty().text('Categories');
-},
+    category: (category) => {
+        var player = new PlaylistPlayer();
+        player.getCategoryById(category);
 
-category: (category) => {
-    var player = new PlaylistPlayer();
-    player.getCategoryById(category);
+        $('#playlist-title').empty().text(category);
+    },
 
-    $('#playlist-title').empty().text(category);
-},
+    playlist: () => {
+        var player = new PlaylistPlayer();
+        player.renderUserPlaylist();
 
-  about: () => {
-    var helloView = new HelloView({
-      template: _.template('Im the about page')
-    }).render();
+        $('#playlist-title').empty().text(`Enter a Spotify Username`);
+    },
 
-    $('#js-app').empty().append(helloView.$el);
-  }
+    userPlaylist: (user) => {
+        var player = new PlaylistPlayer();
+        player.getUserPlaylists(user);
+
+        $('#playlist-title').empty().text(`${user}'s Public Playlists`);
+    },
+
+    about: () => {
+        var helloView = new HelloView({
+            template: _.template('Im the about page')
+        }).render();
+
+        $('#js-app').empty().append(helloView.$el);
+    }
 
 });
