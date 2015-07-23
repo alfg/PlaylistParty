@@ -1,5 +1,6 @@
 @import 'normalize'
 @import 'skeleton'
+@import 'font-awesome.css'
 
 #js-app
 font-size 20px
@@ -115,8 +116,40 @@ h4 {
     transition: all 400ms;
     opacity: 0;
 
-    img {
-        width: 100%;
+    .playlist-item {
+        position: relative;
+
+        .playing {
+            display: none;
+            position: absolute;
+            margin-left: auto;
+            margin-top: 25%;
+            color: #FFF;
+            font-size: 6em;
+            width: 100%;
+            height: 100%;
+
+            &.on {
+                display: block;
+                z-index: 1;
+
+                img {
+                    width: 100%;
+                    transition: all 200ms;
+                    -webkit-filter: blur(3px);
+                }
+            }
+        }
+
+        img {
+            width: 100%;
+            transition: all 200ms;
+
+            &:hover,
+            &.blur {
+                -webkit-filter: blur(3px);
+            }
+        }
     }
 }
 
@@ -132,4 +165,13 @@ h4 {
 
 .show {
     opacity: 1 !important;
+}
+
+#user-form {
+    text-align: center;
+
+    #user-input {
+        width: 50%;
+        height: 48px;
+    }
 }
