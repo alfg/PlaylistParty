@@ -266,10 +266,9 @@ SpotifyService.prototype.getYoutubeVideos = function(tracks, callback) {
 
         var trackName = item.track.name;
         var artistName = item.track.artists[0].name;
-        var query = '{0} {1} {2}'
+        var query = '{0} {1}'
             .replace('{0}', trackName)
-            .replace('{1}', artistName)
-            .replace('{2}', 'video');
+            .replace('{1}', artistName);
 
         // Search Youtube for track by name.
         self.youtubeService.searchYoutube(query, function(data) {

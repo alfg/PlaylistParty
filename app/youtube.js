@@ -1,7 +1,8 @@
 var config = require('../config');
+var cache = require('./cache');
+
 var google = require('googleapis');
 var youtube = google.youtube('v3');
-
 var request = require('request');
 
 function YoutubeService() {
@@ -12,21 +13,32 @@ YoutubeService.prototype.searchYoutube = function(query, callback) {
 
     var self = this;
 
-    var params = {
-        part: 'snippet',
-        videoEmbeddable: 'true',
-        type: 'video',
-        q: query,
-        key: config.googleApiKey
-    };
+	var cacheKey = 'searchYoutube_' + query;
+	var timeout = 60 * 60 * 24; // 24 hours.
 
-    youtube.search.list(params, function(result, data) {
-        if (data !== null && data !== undefined && data.items.length > 0) {
-            callback(data.items[0]);
-        } else {
-            callback(null);
-        }
-    });
+	cache.getOrSet(cacheKey, timeout, searchYoutube, function(data) {
+        callback(data);
+	});
+
+    function searchYoutube(cb) {
+        var params = {
+            part: 'snippet',
+            videoEmbeddable: 'true',
+            type: 'video',
+            q: query + ' official video',
+            key: config.googleApiKey,
+            safeSearch: 'none'
+        };
+
+        youtube.search.list(params, function(result, data) {
+            if (data !== null && data !== undefined && data.items.length > 0) {
+                cb(data.items[0]);
+            } else {
+                cb(null);
+            }
+        });
+    }
+
 };
 
 module.exports = YoutubeService;

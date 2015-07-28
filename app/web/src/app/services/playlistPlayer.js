@@ -129,7 +129,7 @@ export default class PlaylistPlayer {
 
 		var playlist = $(el).data('playlist');
 		self.loadPlaylist(playlist);
-		$('.js-spinner').text('Loading...');
+		$('.js-spinner').text('Loading playlist...');
 		window.scrollTo(0, 0);
 	}
 
