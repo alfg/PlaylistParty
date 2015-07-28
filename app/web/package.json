@@ -31,12 +31,6 @@
     "gulp-util": "^3.0.3",
     "gulp-watch": "^4.1.1",
     "gulp-webpack": "^1.2.0",
-    "karma": "^0.12.31",
-    "karma-chrome-launcher": "^0.1.7",
-    "karma-mocha": "^0.1.10",
-    "karma-spec-reporter": "0.0.16",
-    "karma-webpack": "^1.5.0",
-    "mocha": "^2.2.1",
     "webpack": "^1.5.3",
     "webpack-dev-middleware": "^1.0.11"
   },

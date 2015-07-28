@@ -23,7 +23,6 @@
     "morgan": "^1.6.1",
     "multer": "^0.1.8",
     "node-cache": "^3.0.0",
-    "node-compass": "^0.2.4",
     "request": "^2.58.0"
   }
 }
