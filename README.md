@@ -2,6 +2,8 @@
 
 Play Spotify Playlists on Youtube.
 
+Built with NodeJS, Express, Backbone, and ES6.
+
 http://spotlist.tv
 
 ## Development
