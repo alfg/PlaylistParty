@@ -38,8 +38,6 @@ node server.js
 
 ##### Build Web Frontend
 ```bash
-$ cd app/web
-$ npm install
 $ gulp
 ```
 
