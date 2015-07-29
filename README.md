@@ -21,7 +21,7 @@ $ cd spotlistTV
 $ npm install
 ```
 
-Open `config.js.sample` and configure
+Open `config.js` and configure or set environment variables
 
 ```javascript
 client_id: '<key>',  // Spotify API key.
@@ -29,7 +29,6 @@ client_secret: '<secret>',  // Spotify Secret Key.
 redirect_uri: 'http://localhost:3000/callback',  // Spotify redirect URI.
 googleApiKey: '<google api key>',  // Google API Key.
 ```
-Rename `config.js.sample` to `config.js`.
 
 Run server.
 ```bash
