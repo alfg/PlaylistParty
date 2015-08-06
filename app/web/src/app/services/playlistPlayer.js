@@ -40,7 +40,13 @@ export default class PlaylistPlayer {
 	}
 
 	init() {
+		var self = this;
+
 		this.youTubeLoadPlayer(); // Loads Youtube iFrame Player.
+
+		$('.js-fullscreen').on('click', function(e, el) { self.clickFullscreen(e, this) });
+		$('.js-fullwidth').on('click', function(e, el) { self.clickFullwidth(e, this) });
+		$('.js-normal').on('click', function(e, el) { self.clickNormal(e, this) });
 	}
 
 	buildVideosArray(tracksArr) {
@@ -54,6 +60,30 @@ export default class PlaylistPlayer {
 		}
 
 		return videos;
+	}
+
+	clickNormal(e, el) {
+		var self = this;
+
+		$('.js-player').removeClass('full-screen');
+		$('.js-player').removeClass('full-width');
+		window.scrollTo(0, 0);
+	}
+
+	clickFullscreen(e, el) {
+		var self = this;
+
+		$('.js-player').removeClass('full-width');
+		$('.js-player').addClass('full-screen');
+		window.scrollTo(0, 200);
+	}
+
+	clickFullwidth(e, el) {
+		var self = this;
+
+		$('.js-player').removeClass('full-screen');
+		$('.js-player').addClass('full-width');
+		window.scrollTo(0, 0);
 	}
 
 	getFeaturedPlaylists() {
@@ -152,6 +182,7 @@ export default class PlaylistPlayer {
 				self._player.loadPlaylist(videos, 0, 5, self._options.player.quality);
 				$('.js-spinner').empty();
 				$('#player').slideDown();
+				$('.player-controls').slideDown();
 			});
 	}
 
