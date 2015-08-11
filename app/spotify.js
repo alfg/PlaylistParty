@@ -38,17 +38,17 @@ SpotifyService.prototype.getAuth = function(callback) {
     });
 };
 
-SpotifyService.prototype.getFeaturedPlaylists = function(callback) {
+SpotifyService.prototype.getFeaturedPlaylists = function(date, callback) {
     var self = this;
 
-    var date = formatLocalDate();
+    var timestamp = formatLocalDate(date);
 
     var options = {
         url: 'https://api.spotify.com/v1/browse/featured-playlists',
         qs: {
             country: self.country,
             limit: 50, // Featured playlists max.
-            timestamp: date
+            timestamp: timestamp
         },
         headers: {
             //'Authorization': 'Bearer ' + self.app.locals.token
@@ -282,8 +282,8 @@ SpotifyService.prototype.getYoutubeVideos = function(tracks, callback) {
     }
 }
 
-function formatLocalDate() {
-    var now = new Date(),
+function formatLocalDate(timestamp) {
+    var now = new Date(parseInt(timestamp)),
         tzo = -now.getTimezoneOffset(),
         dif = tzo >= 0 ? '+' : '-',
         pad = function(num) {

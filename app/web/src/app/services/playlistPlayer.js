@@ -20,7 +20,7 @@ export default class PlaylistPlayer {
 			},
 			getCategoriesApi: '/api/categories',
 			getCategoryByIdApi: '/api/categories/{0}',
-			getPlaylistsApi: '/api/playlists',
+			getFeaturedPlaylistsApi: '/api/featured-playlists',
 			getNewReleasesApi: '/api/new-releases',
 			getUserPlaylistsApi: '/api/playlists/{0}',
 			getPlaylistTracksByIdApi: '/api/playlists/{0}/{1}/tracks',
@@ -89,11 +89,16 @@ export default class PlaylistPlayer {
 	getFeaturedPlaylists() {
 		var self = this;
 
+		var d = new Date();
+		var now = d.getTime();
+
 		$('#playlists').removeClass('show');
 
 		$.ajax({
-			url: self._options.getPlaylistsApi,
-			dataType: 'json'
+			url: self._options.getFeaturedPlaylistsApi,
+			data: { timestamp: now },
+			dataType: 'json',
+			type: 'GET'
 		})
 		.done(function(data) {
 			self._playlists = data;
