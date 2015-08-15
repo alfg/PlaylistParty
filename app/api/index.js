@@ -52,8 +52,10 @@ router.get('/categories/:id', function(req, res) {
 
 router.get('/featured-playlists', function(req, res) {
 
-	var date = req.query.timestamp;
-	var cacheKey = 'featured_playlists';
+	var timestamp = req.query.timestamp;
+	var date = new Date(parseInt(timestamp));
+
+	var cacheKey = 'featured_playlists_' + date.getHours();
 	var timeout = 60 * 15; // 15 minutes.
 
 	cache.getOrSet(cacheKey, timeout, getFeaturedPlaylists, function(data) {
@@ -64,7 +66,7 @@ router.get('/featured-playlists', function(req, res) {
 	function getFeaturedPlaylists(callback) {
 	    // Get playlists.
 		var spotifyService = new Spotify();
-	    spotifyService.getFeaturedPlaylists(date, function(data) {
+	    spotifyService.getFeaturedPlaylists(timestamp, function(data) {
             callback(data);
 		});
 	}
