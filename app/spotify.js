@@ -51,7 +51,6 @@ SpotifyService.prototype.getFeaturedPlaylists = function(date, callback) {
             timestamp: timestamp
         },
         headers: {
-            //'Authorization': 'Bearer ' + self.app.locals.token
             'Authorization': 'Bearer ' + cache.token
         },
         json: true
@@ -167,7 +166,6 @@ SpotifyService.prototype.getPlaylistById = function(user_id, playlist_id, callba
             timestamp: date
         },
         headers: {
-            //'Authorization': 'Bearer ' + self.app.locals.token
             'Authorization': 'Bearer ' + cache.token
         },
         json: true
@@ -196,10 +194,10 @@ SpotifyService.prototype.getPlaylistTracksById = function(user_id, playlist_id, 
         qs: {
             country: self.country,
             limit: self.limit,
-            timestamp: date
+            timestamp: date,
+            offset: 0
         },
         headers: {
-            //'Authorization': 'Bearer ' + self.app.locals.token
             'Authorization': 'Bearer ' + cache.token
         },
         json: true
@@ -210,10 +208,26 @@ SpotifyService.prototype.getPlaylistTracksById = function(user_id, playlist_id, 
         // Update auth token.
         options.headers['Authorization'] = 'Bearer ' + cache.token;
 
-        request.get(options, function(error, response, body) {
-            var data = body;
-            callback(data);
-        });
+        var offset = 0;
+        var items = [];
+
+        getData();
+        function getData() {
+            options.qs.offset = offset;
+
+            request.get(options, function(error, response, body) {
+                var data = body;
+
+                items = items.concat(data.items);
+
+                if (data.next !== null && offset < 100) {
+                    offset += 100;
+                    getData();
+                } else {
+                    callback(items);
+                }
+            });
+        }
     });
 }
 
@@ -251,7 +265,7 @@ SpotifyService.prototype.getUserPlaylists = function(user_id, callback) {
 SpotifyService.prototype.getYoutubeVideos = function(tracks, callback) {
     var self = this;
 
-    async.map(tracks.items, getTrack, function(err, results) {
+    async.map(tracks, getTrack, function(err, results) {
         callback(tracks);
     });
 
@@ -262,7 +276,6 @@ SpotifyService.prototype.getYoutubeVideos = function(tracks, callback) {
         //     console.log('we should remove this');
         //     callback(null, null);
         // }
-
 
         var trackName = item.track.name;
         var artistName = item.track.artists[0].name;

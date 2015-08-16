@@ -50,15 +50,16 @@ export default class PlaylistPlayer {
 	}
 
 	buildVideosArray(tracksArr) {
-		var tracks = tracksArr.data.items;
+		var tracks = tracksArr.data;
 		var videos = [];
 
 		for (var i = 0; i < tracks.length; i++) {
 
 			var v = tracks[i].track.external_ids.youtube;
-			videos.push(v);
+			if (v !== undefined) {
+				videos.push(v);
+			}
 		}
-
 		return videos;
 	}
 
