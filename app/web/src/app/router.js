@@ -71,10 +71,11 @@ export default Backbone.Router.extend({
     receiver: () => {
       console.log('receiving...');
       var player = new CastPlayer();
-      player.getFeaturedPlaylists();
-      setTimeout(function() {
-        player.loadPlaylist('Field Party');
-      }, 4000);
+      // player.cast();
+      // player.getFeaturedPlaylists();
+      // setTimeout(function() {
+      //   player.loadPlaylist('Teen Party');
+      // }, 4000);
     }
 
 });

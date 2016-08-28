@@ -4,18 +4,23 @@ export default class Cast {
 		// super(options);
 
     this.session = null;
-    this.namespace = 'urn:x-cast:spotlist';
+    this.namespace = 'urn:x-cast:com.google.cast.spotlist';
+    this._playlist = null;
     this.initializeCastApi();
   }
 
   play(playlist) {
+    var self = this;
     console.log(playlist);
-		chrome.cast.requestSession(this.onRequestSessionSuccess, this.onLaunchError);
+    self._playlist = playlist;
+		chrome.cast.requestSession(this.onRequestSessionSuccess.bind(this), this.onLaunchError);
   }
 
   sendMessage(message) {
-    if (this.session !== null) {
-      this.session.sendMessage(this.namespace, message, this.onSuccess.bind(this), this.onError);
+    var self = this;
+    console.log(message, self.session);
+    if (self.session !== null) {
+      self.session.sendMessage(this.namespace, message, this.onSuccess.bind(this), this.onError);
     } else {
       console.log('sendMessage:error');
     }
@@ -27,6 +32,10 @@ export default class Cast {
 
 		console.log('onRequestSessionSuccess', e);
 		self.session = e;
+
+    setTimeout(function() {
+      self.sendMessage(self._playlist);
+    }, 5000);
 
 		// var mediaInfo = new chrome.cast.media.MediaInfo('HHP5MKgK0o8');
 		// var request = new chrome.cast.media.LoadRequest(mediaInfo);
@@ -64,6 +73,10 @@ export default class Cast {
 
 	onInitSuccess() {
 		console.log('onInitSuccess');
+	}
+
+	onSuccess() {
+		console.log('onSucces');
 	}
 
 	onError() {
