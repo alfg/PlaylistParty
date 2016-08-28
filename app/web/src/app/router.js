@@ -2,6 +2,7 @@ import $ from 'jquery';
 import Backbone from 'backbone';
 
 import PlaylistPlayer from './services/playlistPlayer';
+import CastPlayer from './services/castPlayer';
 import Home from './controllers/home';
 import Playlist from './controllers/playlist';
 
@@ -15,7 +16,8 @@ export default Backbone.Router.extend({
         'playlist/:user': 'userPlaylist',
         'categories': 'categories',
         'categories/:category': 'category',
-        'about': 'about'
+        'about': 'about',
+        'receiver': 'receiver'
     },
 
     initialize: () => {
@@ -25,6 +27,7 @@ export default Backbone.Router.extend({
     home: () => {
         var player = new PlaylistPlayer();
         player.getFeaturedPlaylists();
+        console.log('home');
 
         $('#playlist-title').empty().text('Featured Playlists');
     },
@@ -63,6 +66,15 @@ export default Backbone.Router.extend({
         }).render();
 
         $('#js-app').empty().append(helloView.$el);
+    },
+
+    receiver: () => {
+      console.log('receiving...');
+      var player = new CastPlayer();
+      player.getFeaturedPlaylists();
+      setTimeout(function() {
+        player.loadPlaylist('Field Party');
+      }, 4000);
     }
 
 });

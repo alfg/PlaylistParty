@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import _ from 'lodash';
+import Cast from './cast';
 
 // Underscore JS settings.
 // @see http://underscorejs.org
@@ -33,8 +34,10 @@ export default class PlaylistPlayer {
 		this._options = $.extend(true, {}, this._defaults, options);
 
 		this._playlists = null;
+		this._currentPlaylist = null;
 		this._categories = null;
 		this._player = window._player;
+		this._cast = null;
 
 		this.init();
 	}
@@ -47,6 +50,15 @@ export default class PlaylistPlayer {
 		$('.js-fullscreen').on('click', function(e, el) { self.clickFullscreen(e, this) });
 		$('.js-fullwidth').on('click', function(e, el) { self.clickFullwidth(e, this) });
 		$('.js-normal').on('click', function(e, el) { self.clickNormal(e, this) });
+		$('.js-cast').on('click', function(e, el) { self.clickCast(e, this) });
+
+		window['__onGCastApiAvailable'] = function(loaded, errorInfo) {
+		  if (loaded) {
+					self._cast = new Cast();
+			} else {
+			    console.log(errorInfo);
+			}
+		}
 	}
 
 	buildVideosArray(tracksArr) {
@@ -68,6 +80,12 @@ export default class PlaylistPlayer {
 		$('.js-player').removeClass('full-screen');
 		$('.js-player').removeClass('full-width');
 		window.scrollTo(0, 0);
+	}
+
+	clickCast(e, el) {
+		var self = this;
+		console.log('casting');
+		self._cast.play(self._currentPlaylist);
 	}
 
 	clickFullscreen(e, el) {
@@ -183,8 +201,8 @@ export default class PlaylistPlayer {
 				dataType: 'json'
 			})
 			.done(function(data) {
-				var videos = self.buildVideosArray(data);
-				self._player.loadPlaylist(videos, 0, 5, self._options.player.quality);
+				self._currentPlaylist = self.buildVideosArray(data);
+				self._player.loadPlaylist(self._currentPlaylist, 0, 5, self._options.player.quality);
 				$('.js-spinner').empty();
 				$('#player').slideDown();
 				$('.player-controls').slideDown();
