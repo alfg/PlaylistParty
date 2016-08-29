@@ -1,8 +1,12 @@
 import $ from 'jquery';
 import _ from 'lodash';
 
+import { castApplicationId, castNamespace } from '../../../../../config.js';
+
 export default class CastReceiver {
 	constructor(options) {
+
+		this._namespace = castNamespace || 'urn:x-cast:com.google.cast.spotlist';
 
 		this._defaults = {
 			player: {
@@ -15,7 +19,6 @@ export default class CastReceiver {
 		this._player = window._player;
 		this._castReceiverManager = null;
 		this._messageBus = null;
-		this._namespace = 'urn:x-cast:com.google.cast.spotlist';
 
 		this.init();
 	}
@@ -52,6 +55,9 @@ export default class CastReceiver {
 		var self = this;
     console.log('Received Ready event: ' + JSON.stringify(event.data));
     self._castReceiverManager.setApplicationState("Application status is ready...");
+
+		$('#splash').fadeOut();
+		$('#player').fadeIn();
 	}
 
 	receiverManager_onSenderConnected(event) {
@@ -91,7 +97,7 @@ export default class CastReceiver {
 		var self = this;
 
 		this._player = window._player;
-		this._player.setVolume(0);
+		//this._player.setVolume(0);
 	}
 
 	youTubeLoadPlayer() {

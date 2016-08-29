@@ -1,10 +1,11 @@
+import { castApplicationId, castNamespace } from '../../../../../config.js';
 
 export default class CastSender {
 	constructor(options) {
 
     this.session = null;
-    this.namespace = 'urn:x-cast:com.google.cast.spotlist';
-    this.applicationId = '45F0BB1E';
+    this.namespace = castNamespace || 'urn:x-cast:com.google.cast.spotlist';
+    this.applicationId = castApplicationId || '45F0BB1E';
     this._playlist = null;
 
     this.initializeCastApi();
@@ -13,7 +14,11 @@ export default class CastSender {
   play(playlist) {
     var self = this;
     self._playlist = playlist;
-		chrome.cast.requestSession(this.onRequestSessionSuccess.bind(this), this.onLaunchError);
+    if (self.session !== null) {
+      self.sendMessage(self._playlist);
+    } else {
+		  chrome.cast.requestSession(this.onRequestSessionSuccess.bind(this), this.onLaunchError);
+    }
   }
 
   sendMessage(message) {
@@ -33,9 +38,7 @@ export default class CastSender {
 		console.log('onRequestSessionSuccess', e);
 		self.session = e;
 
-    setTimeout(function() {
-      self.sendMessage(self._playlist);
-    }, 5000);
+    self.sendMessage(self._playlist);
 
     // Default receiver no longer supports Youtube IDs. :(
 		// var mediaInfo = new chrome.cast.media.MediaInfo('HHP5MKgK0o8');

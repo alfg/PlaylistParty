@@ -34,10 +34,13 @@ export default class PlaylistPlayer {
 		this._options = $.extend(true, {}, this._defaults, options);
 
 		this._playlists = null;
-		this._currentPlaylist = null;
+		this._currentPlaylist = null; // Selected playlist array.
+		this._selectedPlaylist = null; // Selected playlist name.
 		this._categories = null;
 		this._player = window._player;
-		this._cast = null;
+		this._cast = window._cast;
+
+		this._isCasting = window._isCasting;
 
 		this.init();
 	}
@@ -54,7 +57,8 @@ export default class PlaylistPlayer {
 
 		window['__onGCastApiAvailable'] = function(loaded, errorInfo) {
 		  if (loaded) {
-					self._cast = new CastSender();
+					window._cast = new CastSender();
+					self._cast = window._cast;
 			} else {
 			    console.log(errorInfo);
 			}
@@ -84,7 +88,34 @@ export default class PlaylistPlayer {
 
 	clickCast(e, el) {
 		var self = this;
-		console.log('casting');
+
+		var el = $('#playlists').find('[data-playlist="' + self._selectedPlaylist + '"]')
+		var bg = el.find('img').attr('src');
+
+		// Hide YT Player.
+		$('#player').slideUp();
+
+		// Show casting banner.
+		$('#casting').css('background-image', 'url(' + bg + ')');
+		$('#casting-text').text('Casting ' + self._selectedPlaylist);
+		$('#casting').slideDown();
+
+		// Pause player and initialize cast.
+		window._isCasting = true;
+		self._player.pauseVideo();
+		self._cast.play(self._currentPlaylist);
+	}
+
+	updateCast() {
+		var self = this;
+
+		var el = $('#playlists').find('[data-playlist="' + self._selectedPlaylist + '"]')
+		var bg = el.find('img').attr('src');
+
+		// Update casting banner.
+		$('#casting').css('background-image', 'url(' + bg + ')');
+		$('#casting-text').text('Casting ' + self._selectedPlaylist);
+
 		self._cast.play(self._currentPlaylist);
 	}
 
@@ -180,8 +211,8 @@ export default class PlaylistPlayer {
 
 		e.preventDefault(); // Prevent updating to index (#) route.
 
-		var playlist = $(el).data('playlist');
-		self.loadPlaylist(playlist);
+		self._selectedPlaylist = $(el).data('playlist');
+		self.loadPlaylist(self._selectedPlaylist);
 		$('.js-spinner').text('Loading playlist...');
 		window.scrollTo(0, 0);
 	}
@@ -202,10 +233,16 @@ export default class PlaylistPlayer {
 			})
 			.done(function(data) {
 				self._currentPlaylist = self.buildVideosArray(data);
-				self._player.loadPlaylist(self._currentPlaylist, 0, 5, self._options.player.quality);
-				$('.js-spinner').empty();
-				$('#player').slideDown();
-				$('.player-controls').slideDown();
+
+				if (window._isCasting) {
+					self.updateCast();
+					$('.js-spinner').empty();
+				} else {
+					self._player.loadPlaylist(self._currentPlaylist, 0, 5, self._options.player.quality);
+					$('.js-spinner').empty();
+					$('#player').slideDown();
+					$('.player-controls').slideDown();
+				}
 			});
 	}
 
