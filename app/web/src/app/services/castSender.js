@@ -1,17 +1,17 @@
 
-export default class Cast {
+export default class CastSender {
 	constructor(options) {
-		// super(options);
 
     this.session = null;
     this.namespace = 'urn:x-cast:com.google.cast.spotlist';
+    this.applicationId = '45F0BB1E';
     this._playlist = null;
+
     this.initializeCastApi();
   }
 
   play(playlist) {
     var self = this;
-    console.log(playlist);
     self._playlist = playlist;
 		chrome.cast.requestSession(this.onRequestSessionSuccess.bind(this), this.onLaunchError);
   }
@@ -37,6 +37,7 @@ export default class Cast {
       self.sendMessage(self._playlist);
     }, 5000);
 
+    // Default receiver no longer supports Youtube IDs. :(
 		// var mediaInfo = new chrome.cast.media.MediaInfo('HHP5MKgK0o8');
 		// var request = new chrome.cast.media.LoadRequest(mediaInfo);
 		// self.session.loadMedia(request,
@@ -65,9 +66,6 @@ export default class Cast {
 		console.log('receiverListener', e);
 		if (e === chrome.cast.ReceiverAvailability.AVAILABLE) {
 			console.log('avail');
-
-			// chrome.cast.requestSession(onRequestSessionSuccess, onLaunchError);
-
 		}
 	}
 
@@ -76,7 +74,7 @@ export default class Cast {
 	}
 
 	onSuccess() {
-		console.log('onSucces');
+		console.log('onSuccess');
 	}
 
 	onError() {
@@ -85,10 +83,12 @@ export default class Cast {
 
 	initializeCastApi() {
 		console.log('cast:init');
-	  var sessionRequest = new chrome.cast.SessionRequest('45F0BB1E');
-	  var apiConfig = new chrome.cast.ApiConfig(sessionRequest,
+	  var sessionRequest = new chrome.cast.SessionRequest(this.applicationId);
+	  var apiConfig = new chrome.cast.ApiConfig(
+      sessionRequest,
 	    this.sessionListener,
-	    this.receiverListener);
+	    this.receiverListener
+    );
 	  chrome.cast.initialize(apiConfig, this.onInitSuccess, this.onError);
 	}
 

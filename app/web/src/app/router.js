@@ -2,7 +2,7 @@ import $ from 'jquery';
 import Backbone from 'backbone';
 
 import PlaylistPlayer from './services/playlistPlayer';
-import CastPlayer from './services/castPlayer';
+import CastReceiver from './services/castReceiver';
 import Home from './controllers/home';
 import Playlist from './controllers/playlist';
 
@@ -70,7 +70,7 @@ export default Backbone.Router.extend({
 
     receiver: () => {
       console.log('receiving...');
-      var player = new CastPlayer();
+      var player = new CastReceiver();
       // player.cast();
       // player.getFeaturedPlaylists();
       // setTimeout(function() {

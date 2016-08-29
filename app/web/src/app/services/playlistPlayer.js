@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import _ from 'lodash';
-import Cast from './cast';
+import CastSender from './castSender';
 
 // Underscore JS settings.
 // @see http://underscorejs.org
@@ -54,7 +54,7 @@ export default class PlaylistPlayer {
 
 		window['__onGCastApiAvailable'] = function(loaded, errorInfo) {
 		  if (loaded) {
-					self._cast = new Cast();
+					self._cast = new CastSender();
 			} else {
 			    console.log(errorInfo);
 			}
