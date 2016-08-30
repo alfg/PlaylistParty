@@ -11,19 +11,38 @@ export default class CastSender {
     this.initializeCastApi();
   }
 
-  play(playlist) {
+  play(playlist, cb) {
     var self = this;
+
     self._playlist = playlist;
+
     if (self.session !== null) {
       self.sendMessage(self._playlist);
     } else {
-		  chrome.cast.requestSession(this.onRequestSessionSuccess.bind(this), this.onLaunchError);
+		  chrome.cast.requestSession(this.onRequestSessionSuccess.bind(this, cb), this.onLaunchError);
+    }
+  }
+
+  stop(cb) {
+    var self = this;
+
+    if (self.session !== null) {
+      self.session.stop(onSuccess.bind(this, cb), onError);
+    }
+
+    function onSuccess(cb, e) {
+      console.log('stop:success');
+      cb();
+    }
+
+    function onError() {
+      console.log('stop:error');
     }
   }
 
   sendMessage(message) {
     var self = this;
-    console.log(message, self.session);
+
     if (self.session !== null) {
       self.session.sendMessage(this.namespace, message, this.onSuccess.bind(this), this.onError);
     } else {
@@ -32,13 +51,15 @@ export default class CastSender {
   }
 
 
-	onRequestSessionSuccess(e) {
+	onRequestSessionSuccess(cb, e) {
     var self = this;
 
-		console.log('onRequestSessionSuccess', e);
+		console.log('onRequestSessionSuccess', cb, e);
 		self.session = e;
 
     self.sendMessage(self._playlist);
+
+    cb();
 
     // Default receiver no longer supports Youtube IDs. :(
 		// var mediaInfo = new chrome.cast.media.MediaInfo('HHP5MKgK0o8');
@@ -48,9 +69,9 @@ export default class CastSender {
 		// 	self.onMediaError
 		// );
 
-		function onMediaDiscovered(how, media) {
-			currentMedia = media;
-		}
+		// function onMediaDiscovered(how, media) {
+		// 	currentMedia = media;
+		// }
 	}
 
 	onMediaError(e) {
@@ -78,6 +99,9 @@ export default class CastSender {
 
 	onSuccess() {
 		console.log('onSuccess');
+
+
+
 	}
 
 	onError() {

@@ -37,9 +37,9 @@ export default class PlaylistPlayer {
 		this._currentPlaylist = null; // Selected playlist array.
 		this._selectedPlaylist = null; // Selected playlist name.
 		this._categories = null;
+
 		this._player = window._player;
 		this._cast = window._cast;
-
 		this._isCasting = window._isCasting;
 
 		this.init();
@@ -61,6 +61,7 @@ export default class PlaylistPlayer {
 					self._cast = window._cast;
 			} else {
 			    console.log(errorInfo);
+					$('.js-cast').hide();
 			}
 		}
 	}
@@ -89,6 +90,16 @@ export default class PlaylistPlayer {
 	clickCast(e, el) {
 		var self = this;
 
+		if (window._isCasting) {
+			self.stopCast();
+		} else {
+			self.startCast();
+		}
+	}
+
+	startCast() {
+		var self = this;
+
 		var el = $('#playlists').find('[data-playlist="' + self._selectedPlaylist + '"]')
 		var bg = el.find('img').attr('src');
 
@@ -97,13 +108,36 @@ export default class PlaylistPlayer {
 
 		// Show casting banner.
 		$('#casting').css('background-image', 'url(' + bg + ')');
-		$('#casting-text').text('Casting ' + self._selectedPlaylist);
+		$('#casting-text').text('Connecting to cast...');
 		$('#casting').slideDown();
 
 		// Pause player and initialize cast.
-		window._isCasting = true;
 		self._player.pauseVideo();
-		self._cast.play(self._currentPlaylist);
+
+		self._cast.play(self._currentPlaylist, function() {
+
+			// Update casting message and button.
+			window._isCasting = true;
+			$('#casting-text').text('Casting ' + self._selectedPlaylist);
+			$('.js-cast').text('Stop Casting');
+		});
+	}
+
+	stopCast() {
+
+		self._cast.stop(function() {
+			window._isCasting = false;
+			console.log('stop cast');
+
+			// Show YT Player.
+			$('#player').slideDown();
+
+			// Show casting banner.
+			$('#casting-text').text('');
+			$('#casting').slideUp();
+			$('.js-cast').text('Cast Playlist');
+		});
+
 	}
 
 	updateCast() {
@@ -215,6 +249,10 @@ export default class PlaylistPlayer {
 		self.loadPlaylist(self._selectedPlaylist);
 		$('.js-spinner').text('Loading playlist...');
 		window.scrollTo(0, 0);
+
+		if (!window._isCasting) {
+			$('#casting').slideUp();
+		}
 	}
 
 	loadPlaylist(playlistName) {
