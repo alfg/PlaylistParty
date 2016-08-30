@@ -8,6 +8,8 @@ var config = {
     client_secret: process.env.CLIENT_SECRET || '',
     redirect_uri: process.env.REDIRECT_URI || 'http://localhost:8888/callback',
     googleApiKey: process.env.GOOGLE_API_KEY || '',
+    castApplicationId: process.env.CAST_APP_ID || '',
+    castNamespace: process.env.CAST_NAMESPACE || 'urn:x-cast:com.google.cast.spotlist'
 }
 
 module.exports = config;

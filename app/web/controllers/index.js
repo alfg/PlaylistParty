@@ -6,4 +6,8 @@ router.get('/', function(req, res, next) {
   res.render('index');
 });
 
+router.get('/receiver', function(req, res, next) {
+  res.render('receiver', { layout: false });
+});
+
 module.exports = router;
