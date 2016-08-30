@@ -1,7 +1,7 @@
 import { castApplicationId, castNamespace } from '../../../../../config.js';
 
 export default class CastSender {
-	constructor(options) {
+  constructor(options) {
 
     this.session = null;
     this.namespace = castNamespace || 'urn:x-cast:com.google.cast.spotlist';
@@ -19,7 +19,7 @@ export default class CastSender {
     if (self.session !== null) {
       self.sendMessage(self._playlist);
     } else {
-		  chrome.cast.requestSession(this.onRequestSessionSuccess.bind(this, cb), this.onLaunchError);
+      chrome.cast.requestSession(this.onRequestSessionSuccess.bind(this, cb), this.onLaunchError);
     }
   }
 
@@ -51,75 +51,75 @@ export default class CastSender {
   }
 
 
-	onRequestSessionSuccess(cb, e) {
+  onRequestSessionSuccess(cb, e) {
     var self = this;
 
-		console.log('onRequestSessionSuccess', cb, e);
-		self.session = e;
+    console.log('onRequestSessionSuccess', cb, e);
+    self.session = e;
 
     self.sendMessage(self._playlist);
 
     cb();
 
     // Default receiver no longer supports Youtube IDs. :(
-		// var mediaInfo = new chrome.cast.media.MediaInfo('HHP5MKgK0o8');
-		// var request = new chrome.cast.media.LoadRequest(mediaInfo);
-		// self.session.loadMedia(request,
-		// 	onMediaDiscovered.bind(this, 'loadMedia'),
-		// 	self.onMediaError
-		// );
+    // var mediaInfo = new chrome.cast.media.MediaInfo('HHP5MKgK0o8');
+    // var request = new chrome.cast.media.LoadRequest(mediaInfo);
+    // self.session.loadMedia(request,
+    //   onMediaDiscovered.bind(this, 'loadMedia'),
+    //   self.onMediaError
+    // );
 
-		// function onMediaDiscovered(how, media) {
-		// 	currentMedia = media;
-		// }
-	}
+    // function onMediaDiscovered(how, media) {
+    //   currentMedia = media;
+    // }
+  }
 
-	onMediaError(e) {
-		console.log('onLaunchError', e);
-	}
+  onMediaError(e) {
+    console.log('onLaunchError', e);
+  }
 
-	onLaunchError(e) {
-		console.log('onLaunchError', e);
-	}
+  onLaunchError(e) {
+    console.log('onLaunchError', e);
+  }
 
-	sessionListener() {
-		console.log('sessionListener');
-	}
+  sessionListener() {
+    console.log('sessionListener');
+  }
 
-	receiverListener(e) {
-		console.log('receiverListener', e);
-		if (e === chrome.cast.ReceiverAvailability.AVAILABLE) {
-			console.log('avail');
-		}
-	}
+  receiverListener(e) {
+    console.log('receiverListener', e);
+    if (e === chrome.cast.ReceiverAvailability.AVAILABLE) {
+      console.log('avail');
+    }
+  }
 
-	onInitSuccess() {
-		console.log('onInitSuccess');
-	}
+  onInitSuccess() {
+    console.log('onInitSuccess');
+  }
 
-	onSuccess() {
-		console.log('onSuccess');
+  onSuccess() {
+    console.log('onSuccess');
 
 
 
-	}
+  }
 
-	onError() {
-		console.log('onError');
-	}
+  onError() {
+    console.log('onError');
+  }
 
-	initializeCastApi() {
-		console.log('cast:init');
-	  var sessionRequest = new chrome.cast.SessionRequest(this.applicationId);
-	  var apiConfig = new chrome.cast.ApiConfig(
+  initializeCastApi() {
+    console.log('cast:init');
+    var sessionRequest = new chrome.cast.SessionRequest(this.applicationId);
+    var apiConfig = new chrome.cast.ApiConfig(
       sessionRequest,
-	    this.sessionListener,
-	    this.receiverListener
+      this.sessionListener,
+      this.receiverListener
     );
-	  chrome.cast.initialize(apiConfig, this.onInitSuccess, this.onError);
-	}
+    chrome.cast.initialize(apiConfig, this.onInitSuccess, this.onError);
+  }
 
-	// if (chrome.cast || chrome.cast.isAvailable) {
-	//   setTimeout(initializeCastApi, 1000);
-	// }
+  // if (chrome.cast || chrome.cast.isAvailable) {
+  //   setTimeout(initializeCastApi, 1000);
+  // }
 }
