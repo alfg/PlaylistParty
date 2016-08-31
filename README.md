@@ -1,23 +1,22 @@
 # SpotlistTV
 
-Play Spotify Playlists on Youtube.
-
-Now with Google Cast!
-
-![Spotlist.TV](screenshot.png)
+Play Spotify Playlists on Youtube. Now with Google Cast!
 
 Built with NodeJS, Express, Backbone, and ES6.
 
 http://spotlist.tv
 
+![Spotlist.TV](screenshot.png)
+
+
 ## Development
 
-##### Register API Keys
+#### Register API Keys
 - https://developer.spotify.com/
 - https://developers.google.com/youtube/v3/getting-started
 
 
-##### Clone and install dependencies
+#### Clone and install dependencies
 
 ```bash
 $ git clone https://github.com/alfg/spotlistTV.git
@@ -41,7 +40,7 @@ Run server.
 node server.js
 ```
 
-##### Build Web Frontend
+#### Build Web Frontend
 ```bash
 $ gulp
 ```
@@ -51,7 +50,7 @@ Frontend will now build and watch for changes. If you want to build without watc
 Visit `http://localhost:3000`
 
 
-##### Chromecast
+#### Chromecast
 If you wish to hack on the custom Google Cast receiver, you'll need to register and whitelist (for debugging) your device and application to obtain an application ID.
 
 https://developers.google.com/cast/docs/registration
