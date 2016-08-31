@@ -1,5 +1,9 @@
 import { castApplicationId, castNamespace } from '../../../../../config.js';
 
+/* CastSender initializes the Chromecast, creates a session when attempting to
+ * cast, and sends messages (Youtube video IDs array) to the receiver app.
+ */
+
 export default class CastSender {
   constructor(options) {
 
@@ -11,6 +15,22 @@ export default class CastSender {
     this.initializeCastApi();
   }
 
+  initializeCastApi() {
+
+    // Create session to custom receiver.
+    var sessionRequest = new chrome.cast.SessionRequest(this.applicationId);
+
+    // Configure session.
+    var apiConfig = new chrome.cast.ApiConfig(
+      sessionRequest,
+      this.sessionListener,
+      this.receiverListener
+    );
+
+    // Intitialize cast.
+    chrome.cast.initialize(apiConfig, this.onInitSuccess, this.onError);
+  }
+
   play(playlist, cb) {
     var self = this;
 
@@ -19,7 +39,18 @@ export default class CastSender {
     if (self.session !== null) {
       self.sendMessage(self._playlist);
     } else {
-      chrome.cast.requestSession(this.onRequestSessionSuccess.bind(this, cb), this.onLaunchError);
+      chrome.cast.requestSession(onRequestSessionSuccess, onError);
+    }
+
+    function onRequestSessionSuccess(e) {
+      self.session = e;
+      self.sendMessage(self._playlist);
+      cb(null);
+    }
+
+    function onError(e) {
+      cb(e);
+      console.log('Error launching cast: ', e);
     }
   }
 
@@ -31,12 +62,12 @@ export default class CastSender {
     }
 
     function onSuccess(cb, e) {
-      console.log('stop:success');
-      cb();
+      cb(null);
     }
 
-    function onError() {
-      console.log('stop:error');
+    function onError(e) {
+      cb(e);
+      console.log('Error stopping cast: ', e);
     }
   }
 
@@ -46,80 +77,23 @@ export default class CastSender {
     if (self.session !== null) {
       self.session.sendMessage(this.namespace, message, this.onSuccess.bind(this), this.onError);
     } else {
-      console.log('sendMessage:error');
+      console.log('Error sending message to cast.');
     }
   }
 
-
-  onRequestSessionSuccess(cb, e) {
-    var self = this;
-
-    console.log('onRequestSessionSuccess', cb, e);
-    self.session = e;
-
-    self.sendMessage(self._playlist);
-
-    cb();
-
-    // Default receiver no longer supports Youtube IDs. :(
-    // var mediaInfo = new chrome.cast.media.MediaInfo('HHP5MKgK0o8');
-    // var request = new chrome.cast.media.LoadRequest(mediaInfo);
-    // self.session.loadMedia(request,
-    //   onMediaDiscovered.bind(this, 'loadMedia'),
-    //   self.onMediaError
-    // );
-
-    // function onMediaDiscovered(how, media) {
-    //   currentMedia = media;
-    // }
-  }
-
-  onMediaError(e) {
-    console.log('onLaunchError', e);
-  }
-
-  onLaunchError(e) {
-    console.log('onLaunchError', e);
-  }
-
-  sessionListener() {
-    console.log('sessionListener');
-  }
+  sessionListener() {}
 
   receiverListener(e) {
-    console.log('receiverListener', e);
     if (e === chrome.cast.ReceiverAvailability.AVAILABLE) {
-      console.log('avail');
+      console.log('Casting ready.');
     }
   }
 
-  onInitSuccess() {
-    console.log('onInitSuccess');
+  onInitSuccess() {}
+
+  onSuccess() {}
+
+  onError(e) {
+    console.log('Error: ', e);
   }
-
-  onSuccess() {
-    console.log('onSuccess');
-
-
-
-  }
-
-  onError() {
-    console.log('onError');
-  }
-
-  initializeCastApi() {
-    console.log('cast:init');
-    var sessionRequest = new chrome.cast.SessionRequest(this.applicationId);
-    var apiConfig = new chrome.cast.ApiConfig(
-      sessionRequest,
-      this.sessionListener,
-      this.receiverListener
-    );
-    chrome.cast.initialize(apiConfig, this.onInitSuccess, this.onError);
-  }
-
-  // if (chrome.cast || chrome.cast.isAvailable) {
-  //   setTimeout(initializeCastApi, 1000);
-  // }
 }

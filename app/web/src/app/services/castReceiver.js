@@ -3,6 +3,12 @@ import _ from 'lodash';
 
 import { castApplicationId, castNamespace } from '../../../../../config.js';
 
+/* CastReceiver is a basic JS app loaded on the Chromecast when the sender sends
+ * a signal. The app loads the Youtube iFrame API similar to the main web player
+ * and just listens for messages (a Youtube video ID array) and loads them into
+ * the Youtube player.
+ */
+
 export default class CastReceiver {
   constructor(options) {
 
@@ -30,20 +36,21 @@ export default class CastReceiver {
 
     cast.receiver.logger.setLevelValue(0);
 
-    self._castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
     console.log('Starting Receiver Manager');
+    self._castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
 
+    // Binding receiver manager events.
     self._castReceiverManager.onReady = self.receiverManager_onReady.bind(this);
     self._castReceiverManager.onSenderConnected = self.receiverManager_onSenderConnected.bind(this);
     self._castReceiverManager.onSenderDisconnected = self.receiverManager_onSenderDisconnected.bind(this);
     self._castReceiverManager.onSystemVolumeChanged = self.receiverManager_onSystemVolumeChanged.bind(this);
 
-    // create a CastMessageBus to handle messages for a custom namespace
+    // Create a CastMessageBus to handle messages for a custom namespace.
     self._messageBus = self._castReceiverManager.getCastMessageBus(self._namespace);
     self._messageBus.onMessage = self.messageBus_onMessage.bind(this);
 
-    // initialize the CastReceiverManager with an application status message
-    self._castReceiverManager.start({statusText: "Application is starting"});
+    // Initialize the CastReceiverManager with an application status message.
+    self._castReceiverManager.start({statusText: 'Application is starting...'});
     console.log('Receiver Manager started');
   }
 
@@ -53,8 +60,9 @@ export default class CastReceiver {
 
   receiverManager_onReady(event) {
     var self = this;
+
     console.log('Received Ready event: ' + JSON.stringify(event.data));
-    self._castReceiverManager.setApplicationState("Application status is ready...");
+    self._castReceiverManager.setApplicationState('Casting...');
 
     $('#splash').fadeOut();
     $('#player').fadeIn();
@@ -62,12 +70,14 @@ export default class CastReceiver {
 
   receiverManager_onSenderConnected(event) {
     var self = this;
+
     console.log('Received Sender Connected event: ' + event.data);
     console.log(self._castReceiverManager.getSender(event.data).userAgent);
   }
 
   receiverManager_onSenderDisconnected(event) {
     var self = this;
+
     console.log('Received Sender Disconnected event: ' + event.data);
     if (self._castReceiverManager.getSenders().length == 0) {
       window.close();
@@ -81,15 +91,14 @@ export default class CastReceiver {
 
   messageBus_onMessage(event) {
     var self = this;
+
     console.log('Message [' + event.senderId + ']: ' + event.data);
-    // display the message from the sender
-    //displayText(event.data);
 
-    console.log(event);
-
+    // Load the playlist into the Youtube player.
     self._player.loadPlaylist(JSON.parse(event.data), 0, 5, self._options.player.quality);
-    // inform all senders on the CastMessageBus of the incoming message event
-    // sender message listener will be invoked
+
+    // Inform all senders on the CastMessageBus of the incoming message event.
+    // Sender message listener will be invoked.
     self._messageBus.send(event.senderId, event.data);
   }
 
@@ -97,12 +106,13 @@ export default class CastReceiver {
     var self = this;
 
     this._player = window._player;
-    //this._player.setVolume(0);
+    //  this._player.setVolume(0); // Mute when debugging.
   }
 
   youTubeLoadPlayer() {
 
     var self = this;
+
     // Setup ready event callback for YouTube iframe API.
     window.onYouTubeIframeAPIReady = function() { self.youTube_IframeAPIReady(self._options); };
 

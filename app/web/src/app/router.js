@@ -27,7 +27,6 @@ export default Backbone.Router.extend({
     home: () => {
         var player = new PlaylistPlayer();
         player.getFeaturedPlaylists();
-        console.log('home');
 
         $('#playlist-title').empty().text('Featured Playlists');
     },
@@ -71,11 +70,6 @@ export default Backbone.Router.extend({
     receiver: () => {
       console.log('receiving...');
       var player = new CastReceiver();
-      // player.cast();
-      // player.getFeaturedPlaylists();
-      // setTimeout(function() {
-      //   player.loadPlaylist('Teen Party');
-      // }, 4000);
     }
 
 });

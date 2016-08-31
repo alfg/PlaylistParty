@@ -5,14 +5,13 @@ import CastSender from './castSender';
 // Underscore JS settings.
 // @see http://underscorejs.org
 _.templateSettings = {
-  evaluate:     /\{\{#([\s\S]+?)\}\}/g,       // {{# console.log("blah") }}
-  interpolate:   /\{\{[^#\{]([\s\S]+?)[^\}]\}\}/g,   // {{ title }}
-  escape:     /\{\{\{([\s\S]+?)\}\}\}/g,       // {{{ title }}}
+  evaluate:     /\{\{#([\s\S]+?)\}\}/g,  // {{# console.log("blah") }}
+  interpolate:   /\{\{[^#\{]([\s\S]+?)[^\}]\}\}/g, // {{ title }}
+  escape:     /\{\{\{([\s\S]+?)\}\}\}/g, // {{{ title }}}
 }
 
 export default class PlaylistPlayer {
   constructor(options) {
-    // super(options);
 
     this._defaults = {
       player: {
@@ -38,6 +37,7 @@ export default class PlaylistPlayer {
     this._selectedPlaylist = null; // Selected playlist name.
     this._categories = null;
 
+		// Bind to global instance.
     this._player = window._player;
     this._cast = window._cast;
     this._isCasting = window._isCasting;
@@ -55,13 +55,13 @@ export default class PlaylistPlayer {
     $('.js-normal').on('click', function(e, el) { self.clickNormal(e, this) });
     $('.js-cast').on('click', function(e, el) { self.clickCast(e, this) });
 
-    window['__onGCastApiAvailable'] = function(loaded, errorInfo) {
+    window['__onGCastApiAvailable'] = function(loaded, err) {
       if (loaded) {
           window._cast = new CastSender();
           self._cast = window._cast;
       } else {
-          console.log(errorInfo);
           $('.js-cast').hide();
+          console.log('Error loading cast: ', err);
       }
     }
   }
@@ -114,7 +114,13 @@ export default class PlaylistPlayer {
     // Pause player and initialize cast.
     self._player.pauseVideo();
 
-    self._cast.play(self._currentPlaylist, function() {
+    self._cast.play(self._currentPlaylist, function(err) {
+
+			if (err !== null) {
+      	$('#casting-text').text('Error');
+				console.log('Error casting', err);
+				return;
+			}
 
       // Update casting message and button.
       window._isCasting = true;
@@ -124,8 +130,16 @@ export default class PlaylistPlayer {
   }
 
   stopCast() {
+		var self = this;
 
-    self._cast.stop(function() {
+    self._cast.stop(function(err) {
+			
+			if (err !== null) {
+      	$('#casting-text').text('Error');
+				console.log('Error stopping cast', err);
+				return;
+			}
+
       window._isCasting = false;
       console.log('stop cast');
 
@@ -137,7 +151,6 @@ export default class PlaylistPlayer {
       $('#casting').slideUp();
       $('.js-cast').text('Cast Playlist');
     });
-
   }
 
   updateCast() {

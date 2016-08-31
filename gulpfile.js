@@ -23,8 +23,6 @@ var autoprefixerBrowsers = [
   'bb >= 10'
 ];
 
-
-
 gulp.task('scripts', function() {
   return gulp.src(webpackConfig.entry)
     .pipe($.webpack(webpackConfig))
@@ -80,13 +78,10 @@ gulp.task('clean', function(cb) {
   del([dist], cb);
 });
 
-
-
 // by default build project and then watch files in order to trigger livereload
 gulp.task('default', ['build', 'serve', 'watch']);
 
 // waits until clean is finished then builds the project
 gulp.task('build', ['clean'], function(){
-  // gulp.start(['static', 'html','scripts','styles']);
   gulp.start(['static', 'scripts', 'styles']);
 });
