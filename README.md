@@ -4,7 +4,8 @@ Play Spotify Playlists on Youtube. Now with Google Cast!
 
 Built with NodeJS, Express, Backbone, and ES6.
 
-http://spotlist.tv
+* http://spotlist.tv
+* https://spotlist-tv.herokuapp.com
 
 ![Spotlist.TV](screenshot.png)
 
