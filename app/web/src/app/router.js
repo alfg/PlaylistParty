@@ -3,8 +3,8 @@ import Backbone from 'backbone';
 
 import PlaylistPlayer from './services/playlistPlayer';
 import CastReceiver from './services/castReceiver';
-import Home from './controllers/home';
-import Playlist from './controllers/playlist';
+// import Home from './controllers/home';
+// import Playlist from './controllers/playlist';
 
 
 export default Backbone.Router.extend({
@@ -13,7 +13,8 @@ export default Backbone.Router.extend({
         '': 'home',
         'featured-playlists': 'home',
         'playlist': 'playlist',
-        'playlist/:user': 'userPlaylist',
+        'playlist/:user': 'userPlaylists',
+        'playlist/:user/:playlistId': 'userPlaylist',
         'categories': 'categories',
         'categories/:category': 'category',
         'about': 'about',
@@ -52,11 +53,19 @@ export default Backbone.Router.extend({
         $('#playlist-title').empty().text(`Enter a Spotify Username`);
     },
 
-    userPlaylist: (user) => {
+    userPlaylists: (user) => {
         var player = new PlaylistPlayer();
         player.getUserPlaylists(user);
 
         $('#playlist-title').empty().text(`${user}'s Public Playlists`);
+    },
+
+    userPlaylist: (user, playlistId) => {
+        var player = new PlaylistPlayer();
+        player.getUserPlaylistById(user, playlistId, (data) => {
+          $('#playlist-title').empty().text(`Playing ${data.name}`);
+        });
+
     },
 
     about: () => {

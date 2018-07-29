@@ -23,6 +23,7 @@ export default class PlaylistPlayer {
       getFeaturedPlaylistsApi: '/api/featured-playlists',
       getNewReleasesApi: '/api/new-releases',
       getUserPlaylistsApi: '/api/playlists/{0}',
+      getUserPlaylistsByIdApi: '/api/playlists/{0}/{1}',
       getPlaylistTracksByIdApi: '/api/playlists/{0}/{1}/tracks',
 
       userPlaylistTemplate: '/static/tmpl/userPlaylist.html',
@@ -133,7 +134,7 @@ export default class PlaylistPlayer {
 		var self = this;
 
     self._cast.stop(function(err) {
-			
+
 			if (err !== null) {
       	$('#casting-text').text('Error');
 				console.log('Error stopping cast', err);
@@ -245,7 +246,30 @@ export default class PlaylistPlayer {
       self._playlists = data;
       self.renderPlaylists(data);
     });
+  }
 
+  getUserPlaylistById(user, playlistId, callback) {
+    var self = this;
+
+    $('#playlists').removeClass('show');
+
+    $.ajax({
+      url: String.format(self._options.getUserPlaylistsByIdApi, user, playlistId),
+      dataType: 'json'
+    })
+    .done(function(data) {
+      self._playlists = data;
+      self._selectedPlaylist = playlistId;
+
+      // Load playlist when player is ready.
+      var timer = setInterval(() => {
+        if (self._player !== undefined) {
+          self.loadPlaylist(self._selectedPlaylist);
+          callback(data.data);
+          clearInterval(timer);
+        }
+      }, 500);
+    });
   }
 
   clickPlaylist(e, el) {
@@ -273,7 +297,7 @@ export default class PlaylistPlayer {
 
     var playlist = _.find(self._playlists.data, function(p) {
       return p.name == playlistName
-    });
+    }) || self._playlists.data;
 
     var url = String.format(self._options.getPlaylistTracksByIdApi,
       playlist.owner.id, playlist.id);
