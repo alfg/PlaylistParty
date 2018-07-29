@@ -3,8 +3,6 @@ import Backbone from 'backbone';
 
 import PlaylistPlayer from './services/playlistPlayer';
 import CastReceiver from './services/castReceiver';
-// import Home from './controllers/home';
-// import Playlist from './controllers/playlist';
 
 
 export default Backbone.Router.extend({
