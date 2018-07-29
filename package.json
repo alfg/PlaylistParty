@@ -1,10 +1,11 @@
 {
-  "name": "SpotlistTV",
+  "name": "spotlist-tv",
   "version": "0.0.1",
   "description": "Spotify to Youtube Playlists.",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "./node_modules/.bin/gulp build && node server.js",
+    "start-dev": "./node_modules/.bin/gulp build && nodemon server.js"
   },
   "engines": {
     "node": "6.11.1"
