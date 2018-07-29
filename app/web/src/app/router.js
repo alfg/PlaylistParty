@@ -63,7 +63,6 @@ export default Backbone.Router.extend({
         player.getUserPlaylistById(user, playlistId, (data) => {
           $('#playlist-title').empty().text(`Playing ${data.name}`);
         });
-
     },
 
     about: () => {
