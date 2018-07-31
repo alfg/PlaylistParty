@@ -264,9 +264,9 @@ export default class PlaylistPlayer {
       // Load playlist when player is ready.
       var timer = setInterval(() => {
         if (self._player !== undefined) {
-          self.loadPlaylist(self._selectedPlaylist);
-          callback(data.data);
+          self.loadPlaylistById(self._selectedPlaylist);
           clearInterval(timer);
+          return callback(data.data);
         }
       }, 500);
     });
@@ -283,7 +283,7 @@ export default class PlaylistPlayer {
     e.preventDefault(); // Prevent updating to index (#) route.
 
     self._selectedPlaylist = $(el).data('playlist');
-    self.loadPlaylist(self._selectedPlaylist);
+    self.loadPlaylistByName(self._selectedPlaylist);
     $('.js-spinner').text('Loading playlist...');
     window.scrollTo(0, 0);
 
@@ -292,12 +292,24 @@ export default class PlaylistPlayer {
     }
   }
 
-  loadPlaylist(playlistName) {
+  loadPlaylistById(playlistId) {
+    var self = this;
+
+    var playlist = self._playlists.data;
+    self.loadPlaylist(playlist);
+  }
+
+  loadPlaylistByName(playlistName) {
     var self = this;
 
     var playlist = _.find(self._playlists.data, function(p) {
       return p.name == playlistName
     }) || self._playlists.data;
+    self.loadPlaylist(playlist);
+  }
+
+  loadPlaylist(playlist) {
+    var self = this;
 
     var url = String.format(self._options.getPlaylistTracksByIdApi,
       playlist.owner.id, playlist.id);
