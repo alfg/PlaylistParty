@@ -19,7 +19,7 @@
     "youtube",
     "playlist"
   ],
-  "author": "Alf",
+  "author": "Alfred Gutierrez <alf.g.jr@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "async": "^1.5.2",
@@ -32,7 +32,6 @@
     "cookie-parser": "^1.4.5",
     "del": "^1.2.1",
     "express": "^4.17.1",
-    "googleapis": "^2.1.7",
     "gulp": "^3.9.1",
     "gulp-autoprefixer": "^2.3.1",
     "gulp-concat": "^2.6.1",
@@ -54,5 +53,8 @@
     "request": "^2.88.2",
     "webpack": "^1.15.0",
     "webpack-dev-middleware": "^1.12.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
   }
 }

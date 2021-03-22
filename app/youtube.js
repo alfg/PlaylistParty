@@ -1,44 +1,79 @@
-var config = require('../config');
-var cache = require('./cache');
+var config = require("../config");
+var cache = require("./cache");
+var request = require("request");
 
-var google = require('googleapis');
-var youtube = google.youtube('v3');
-var request = require('request');
+function YoutubeService() {}
 
-function YoutubeService() {
-}
+YoutubeService.prototype.searchYoutube = function (query, callback) {
+  var self = this;
 
-YoutubeService.prototype.searchYoutube = function(query, callback) {
-    // See: https://developers.google.com/youtube/v3/docs/search/list
+  var cacheKey = "searchYoutube_" + query;
+  var timeout = 60 * 60 * 24; // 24 hours.
 
-    var self = this;
+  cache.getOrSet(cacheKey, timeout, searchYoutube, function (data) {
+    callback(data);
+  });
 
-	var cacheKey = 'searchYoutube_' + query;
-	var timeout = 60 * 60 * 24; // 24 hours.
+  function searchYoutube(cb) {
+    search(query, cb);
+  }
+};
 
-	cache.getOrSet(cacheKey, timeout, searchYoutube, function(data) {
-        callback(data);
-	});
+function search(query, callback) {
+  var self = this;
 
-    function searchYoutube(cb) {
-        var params = {
-            part: 'snippet',
-            videoEmbeddable: 'true',
-            type: 'video',
-            q: query + ' official video',
-            key: config.googleApiKey,
-            safeSearch: 'none'
-        };
+  var url = "https://www.youtube.com/results?q=" + encodeURIComponent(query);
+  var json = { results: [] };
 
-        youtube.search.list(params, function(result, data) {
-            if (data !== null && data !== undefined && data.items.length > 0) {
-                cb(data.items[0]);
-            } else {
-                cb(null);
-            }
-        });
+  request(url, function (err, response, html) {
+    json["parser"] = "json_format";
+    json["key"] = html.match(/"innertubeApiKey":"([^"]*)/)[1];
+
+    var data;
+    var sectionLists = [];
+    try {
+      var match = html.match(/ytInitialData[^{]*(.*?);\s*<\/script>/s);
+      if (match && match.length > 1) {
+        json["parser"] += ".object_var";
+      } else {
+        json["parser"] += ".original";
+        match = html.match(/ytInitialData"[^{]*(.*);\s*window\["ytInitialPlayerResponse"\]/s);
+      }
+      data = JSON.parse(match[1]);
+      json["estimatedResults"] = data.estimatedResults || "0";
+      sectionLists = data.contents.twoColumnSearchResultsRenderer.primaryContents
+        .sectionListRenderer.contents;
+    } catch (ex) {
+      console.error("Failed to parse data: ", ex);
     }
 
+    parseJson(sectionLists, json);
+
+    return callback(json.results[0]);
+  });
 };
+
+function parseJson(contents, json) {
+  contents.forEach(function(sectionList) {
+    try {
+      if (sectionList.hasOwnProperty("itemSectionRenderer")) {
+        sectionList.itemSectionRenderer.contents.forEach(function(content) {
+          try {
+            if (content.hasOwnProperty("videoRenderer")) {
+              json.results.push({ id: content.videoRenderer.videoId });
+            }
+          } catch (ex) {
+            console.error("Failed to parse renderer:", ex);
+          }
+        });
+      } else if (sectionList.hasOwnProperty("continuationItemRenderer")) {
+        json["nextPageToken"] = sectionList.continuationItemRenderer
+          .continuationEndpoint.continuationCommand.token;
+      }
+    } catch (ex) {
+      console.error("Failed to read contents for section list:", ex);
+    }
+  });
+}
 
 module.exports = YoutubeService;

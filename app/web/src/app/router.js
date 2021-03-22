@@ -15,7 +15,6 @@ export default Backbone.Router.extend({
         'playlist/:user/:playlistId': 'userPlaylist',
         'categories': 'categories',
         'categories/:category': 'category',
-        'about': 'about',
         'receiver': 'receiver'
     },
 
@@ -63,14 +62,6 @@ export default Backbone.Router.extend({
         player.getUserPlaylistById(user, playlistId, (data) => {
           $('#playlist-title').empty().text(`Playing ${data.name}`);
         });
-    },
-
-    about: () => {
-        var helloView = new HelloView({
-            template: _.template('Im the about page')
-        }).render();
-
-        $('#js-app').empty().append(helloView.$el);
     },
 
     receiver: () => {

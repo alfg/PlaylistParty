@@ -256,14 +256,6 @@ SpotifyService.prototype.getYoutubeVideos = function(tracks, callback) {
     });
 
     function getTrack(item, cb) {
-
-        // TODO
-        // if (item.track.duration_ms < 5000) {
-        //     console.log('we should remove this');
-        //     callback(null, null);
-        // }
-
-
         var trackName = item.track.name;
         var artistName = item.track.artists[0].name;
         var query = '{0} {1}'
@@ -273,7 +265,7 @@ SpotifyService.prototype.getYoutubeVideos = function(tracks, callback) {
         // Search Youtube for track by name.
         self.youtubeService.searchYoutube(query, function(data) {
             if (data !== null && data !== undefined) {
-                item.track.external_ids['youtube'] = data.id.videoId;
+                item.track.external_ids['youtube'] = data.id;
                 cb();
             } else {
                 cb();
