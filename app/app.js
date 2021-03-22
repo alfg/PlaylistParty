@@ -1,9 +1,7 @@
 var path = require('path');
 var express = require('express');
 var bodyParser = require('body-parser');
-var multer = require('multer');
 var morgan = require('morgan');
-var cookieParser = require('cookie-parser');
 
 var config = require('../config');
 var routes = require('./api/routes');
@@ -23,8 +21,6 @@ app.set('view engine', 'hbs');
 app.use(morgan('dev')); // log requests to the console
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
-app.use(multer()); // for parsing multipart/form-data
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'web/dist')));
 
 app.use('/', web);

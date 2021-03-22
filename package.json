@@ -22,14 +22,12 @@
   "author": "Alfred Gutierrez <alf.g.jr@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "async": "^1.5.2",
+    "async": "^3.2.0",
     "babel-core": "^4.7.16",
     "babel-loader": "^4.3.0",
     "backbone": "^1.4.0",
     "backbone.marionette": "^2.4.7",
     "body-parser": "^1.19.0",
-    "chai": "^2.3.0",
-    "cookie-parser": "^1.4.5",
     "del": "^1.2.1",
     "express": "^4.17.1",
     "gulp": "^3.9.1",
@@ -44,15 +42,14 @@
     "gulp-util": "^3.0.8",
     "gulp-watch": "^4.3.11",
     "gulp-webpack": "^1.5.0",
-    "hbs": "^3.1.1",
+    "hbs": "^4.1.1",
     "jquery": "^3.6.0",
     "lodash": "^4.17.21",
     "morgan": "^1.10.0",
-    "multer": "^0.1.8",
     "node-cache": "^3.2.1",
     "request": "^2.88.2",
-    "webpack": "^1.15.0",
-    "webpack-dev-middleware": "^1.12.2"
+    "webpack": "^5.27.1",
+    "webpack-dev-middleware": "^4.1.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"
