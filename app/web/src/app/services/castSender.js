@@ -75,7 +75,7 @@ export default class CastSender {
     var self = this;
 
     if (self.session !== null) {
-      self.session.sendMessage(this.namespace, message, this.onSuccess.bind(this), this.onError);
+      self.session.sendMessage(this.namespace, { videos: message }, this.onSuccess, this.onError);
     } else {
       console.log('Error sending message to cast.');
     }

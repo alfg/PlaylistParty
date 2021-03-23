@@ -54,10 +54,6 @@ export default class CastReceiver {
     console.log('Receiver Manager started');
   }
 
-  cast() {
-
-  }
-
   receiverManager_onReady(event) {
     var self = this;
 
@@ -95,7 +91,7 @@ export default class CastReceiver {
     console.log('Message [' + event.senderId + ']: ' + event.data);
 
     // Load the playlist into the Youtube player.
-    self._player.loadPlaylist(JSON.parse(event.data), 0, 5, self._options.player.quality);
+    self._player.loadPlaylist(JSON.parse(event.data).videos, 0, 5, self._options.player.quality);
 
     // Inform all senders on the CastMessageBus of the incoming message event.
     // Sender message listener will be invoked.
@@ -110,7 +106,6 @@ export default class CastReceiver {
   }
 
   youTubeLoadPlayer() {
-
     var self = this;
 
     // Setup ready event callback for YouTube iframe API.
@@ -131,7 +126,6 @@ export default class CastReceiver {
     var self = this;
 
     window._player = new YT.Player('player', {
-
       playerVars: {
         controls: 0,
         autoplay: 1,

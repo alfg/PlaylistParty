@@ -1,34 +1,33 @@
-import $ from 'jquery';
-import _ from 'lodash';
-import CastSender from './castSender';
+import $ from "jquery";
+import _ from "lodash";
+import CastSender from "./castSender";
 
 // Underscore JS settings.
 // @see http://underscorejs.org
 _.templateSettings = {
-  evaluate:     /\{\{#([\s\S]+?)\}\}/g,  // {{# console.log("blah") }}
-  interpolate:   /\{\{[^#\{]([\s\S]+?)[^\}]\}\}/g, // {{ title }}
-  escape:     /\{\{\{([\s\S]+?)\}\}\}/g, // {{{ title }}}
-}
+  evaluate: /\{\{#([\s\S]+?)\}\}/g, // {{# console.log("blah") }}
+  interpolate: /\{\{[^#\{]([\s\S]+?)[^\}]\}\}/g, // {{ title }}
+  escape: /\{\{\{([\s\S]+?)\}\}\}/g, // {{{ title }}}
+};
 
 export default class PlaylistPlayer {
   constructor(options) {
-
     this._defaults = {
       player: {
-        quality: 'hd720',
-        autohide: 1
+        quality: "hd720",
+        autohide: 1,
       },
-      getCategoriesApi: '/api/categories',
-      getCategoryByIdApi: '/api/categories/{0}',
-      getFeaturedPlaylistsApi: '/api/featured-playlists',
-      getNewReleasesApi: '/api/new-releases',
-      getUserPlaylistsApi: '/api/playlists/{0}',
-      getUserPlaylistsByIdApi: '/api/playlists/{0}/{1}',
-      getPlaylistTracksByIdApi: '/api/playlists/{0}/{1}/tracks',
+      getCategoriesApi: "/api/categories",
+      getCategoryByIdApi: "/api/categories/{0}",
+      getFeaturedPlaylistsApi: "/api/featured-playlists",
+      getNewReleasesApi: "/api/new-releases",
+      getUserPlaylistsApi: "/api/playlists/{0}",
+      getUserPlaylistsByIdApi: "/api/playlists/{0}/{1}",
+      getPlaylistTracksByIdApi: "/api/playlists/{0}/{1}/tracks",
 
-      userPlaylistTemplate: '/static/tmpl/userPlaylist.html',
-      playlistTemplate: '/static/tmpl/playlists.html',
-      categoriesTemplate: '/static/tmpl/categories.html'
+      userPlaylistTemplate: "/static/tmpl/userPlaylist.html",
+      playlistTemplate: "/static/tmpl/playlists.html",
+      categoriesTemplate: "/static/tmpl/categories.html",
     };
 
     this._options = $.extend(true, {}, this._defaults, options);
@@ -38,7 +37,7 @@ export default class PlaylistPlayer {
     this._selectedPlaylist = null; // Selected playlist name.
     this._categories = null;
 
-		// Bind to global instance.
+    // Bind to global instance.
     this._player = window._player;
     this._cast = window._cast;
     this._isCasting = window._isCasting;
@@ -51,20 +50,28 @@ export default class PlaylistPlayer {
 
     this.youTubeLoadPlayer(); // Loads Youtube iFrame Player.
 
-    $('.js-fullscreen').on('click', function(e, el) { self.clickFullscreen(e, this) });
-    $('.js-fullwidth').on('click', function(e, el) { self.clickFullwidth(e, this) });
-    $('.js-normal').on('click', function(e, el) { self.clickNormal(e, this) });
-    $('.js-cast').on('click', function(e, el) { self.clickCast(e, this) });
+    $(".js-fullscreen").on("click", function (e, el) {
+      self.clickFullscreen(e, this);
+    });
+    $(".js-fullwidth").on("click", function (e, el) {
+      self.clickFullwidth(e, this);
+    });
+    $(".js-normal").on("click", function (e, el) {
+      self.clickNormal(e, this);
+    });
+    $(".js-cast").on("click", function (e, el) {
+      self.clickCast(e, this);
+    });
 
-    window['__onGCastApiAvailable'] = function(loaded, err) {
+    window["__onGCastApiAvailable"] = function (loaded, err) {
       if (loaded) {
-          window._cast = new CastSender();
-          self._cast = window._cast;
+        window._cast = new CastSender();
+        self._cast = window._cast;
       } else {
-          $('.js-cast').hide();
-          console.log('Error loading cast: ', err);
+        $(".js-cast").hide();
+        console.log("Error loading cast: ", err);
       }
-    }
+    };
   }
 
   buildVideosArray(tracksArr) {
@@ -72,7 +79,6 @@ export default class PlaylistPlayer {
     var videos = [];
 
     for (var i = 0; i < tracks.length; i++) {
-
       var v = tracks[i].track.external_ids.youtube;
       videos.push(v);
     }
@@ -83,8 +89,8 @@ export default class PlaylistPlayer {
   clickNormal(e, el) {
     var self = this;
 
-    $('.js-player').removeClass('full-screen');
-    $('.js-player').removeClass('full-width');
+    $(".js-player").removeClass("full-screen");
+    $(".js-player").removeClass("full-width");
     window.scrollTo(0, 0);
   }
 
@@ -101,68 +107,70 @@ export default class PlaylistPlayer {
   startCast() {
     var self = this;
 
-    var el = $('#playlists').find('[data-playlist="' + self._selectedPlaylist + '"]')
-    var bg = el.find('img').attr('src');
+    var el = $("#playlists").find(
+      '[data-playlist="' + self._selectedPlaylist + '"]'
+    );
+    var bg = el.find("img").attr("src");
 
     // Hide YT Player.
-    $('#player').slideUp();
+    $("#player").slideUp();
 
     // Show casting banner.
-    $('#casting').css('background-image', 'url(' + bg + ')');
-    $('#casting-text').text('Connecting to cast...');
-    $('#casting').slideDown();
+    $("#casting").css("background-image", "url(" + bg + ")");
+    $("#casting-text").text("Connecting to cast...");
+    $("#casting").slideDown();
 
     // Pause player and initialize cast.
     self._player.pauseVideo();
 
-    self._cast.play(self._currentPlaylist, function(err) {
-
-			if (err !== null) {
-      	$('#casting-text').text('Error');
-				console.log('Error casting', err);
-				return;
-			}
+    self._cast.play(self._currentPlaylist, function (err) {
+      if (err) {
+        $("#casting-text").text("Error");
+        console.log("Error casting", err);
+        return;
+      }
 
       // Update casting message and button.
       window._isCasting = true;
-      $('#casting-text').text('Casting ' + self._selectedPlaylist);
-      $('.js-cast').text('Stop Casting');
+      $("#casting-text").text("Casting " + self._selectedPlaylist);
+      $(".js-cast").text("Stop Casting");
     });
   }
 
   stopCast() {
-		var self = this;
+    var self = this;
 
-    self._cast.stop(function(err) {
-
-			if (err !== null) {
-      	$('#casting-text').text('Error');
-				console.log('Error stopping cast', err);
-				return;
-			}
+    self._cast.stop(function (err) {
+      if (err !== null) {
+        $("#casting-text").text("Error");
+        console.log("Error stopping cast", err);
+        return;
+      }
 
       window._isCasting = false;
-      console.log('stop cast');
+      console.log("stop cast");
 
       // Show YT Player.
-      $('#player').slideDown();
+      $("#player").slideDown();
 
       // Show casting banner.
-      $('#casting-text').text('');
-      $('#casting').slideUp();
-      $('.js-cast').text('Cast Playlist');
+      $("#casting-text").text("");
+      $("#casting").slideUp();
+      $(".js-cast").text("Cast Playlist");
     });
   }
 
   updateCast() {
     var self = this;
 
-    var el = $('#playlists').find('[data-playlist="' + self._selectedPlaylist + '"]')
-    var bg = el.find('img').attr('src');
+    var el = $("#playlists").find(
+      '[data-playlist="' + self._selectedPlaylist + '"]'
+    );
+    var bg = el.find("img").attr("src");
 
     // Update casting banner.
-    $('#casting').css('background-image', 'url(' + bg + ')');
-    $('#casting-text').text('Casting ' + self._selectedPlaylist);
+    $("#casting").css("background-image", "url(" + bg + ")");
+    $("#casting-text").text("Casting " + self._selectedPlaylist);
 
     self._cast.play(self._currentPlaylist);
   }
@@ -170,16 +178,16 @@ export default class PlaylistPlayer {
   clickFullscreen(e, el) {
     var self = this;
 
-    $('.js-player').removeClass('full-width');
-    $('.js-player').addClass('full-screen');
+    $(".js-player").removeClass("full-width");
+    $(".js-player").addClass("full-screen");
     window.scrollTo(0, 200);
   }
 
   clickFullwidth(e, el) {
     var self = this;
 
-    $('.js-player').removeClass('full-screen');
-    $('.js-player').addClass('full-width');
+    $(".js-player").removeClass("full-screen");
+    $(".js-player").addClass("full-width");
     window.scrollTo(0, 0);
   }
 
@@ -189,15 +197,14 @@ export default class PlaylistPlayer {
     var d = new Date();
     var now = d.getTime();
 
-    $('#playlists').removeClass('show');
+    $("#playlists").removeClass("show");
 
     $.ajax({
       url: self._options.getFeaturedPlaylistsApi,
       data: { timestamp: now },
-      dataType: 'json',
-      type: 'GET'
-    })
-    .done(function(data) {
+      dataType: "json",
+      type: "GET",
+    }).done(function (data) {
       self._playlists = data;
       self.renderPlaylists(data);
     });
@@ -206,13 +213,12 @@ export default class PlaylistPlayer {
   getCategories() {
     var self = this;
 
-    $('#playlists').removeClass('show');
+    $("#playlists").removeClass("show");
 
     $.ajax({
       url: self._options.getCategoriesApi,
-      dataType: 'json'
-    })
-    .done(function(data) {
+      dataType: "json",
+    }).done(function (data) {
       self._categories = data;
       self.renderCategories(data);
     });
@@ -221,13 +227,12 @@ export default class PlaylistPlayer {
   getCategoryById(category) {
     var self = this;
 
-    $('#playlists').removeClass('show');
+    $("#playlists").removeClass("show");
 
     $.ajax({
       url: String.format(self._options.getCategoryByIdApi, category),
-      dataType: 'json'
-    })
-    .done(function(data) {
+      dataType: "json",
+    }).done(function (data) {
       self._playlists = data;
       self.renderPlaylists(data);
     });
@@ -236,13 +241,12 @@ export default class PlaylistPlayer {
   getUserPlaylists(user) {
     var self = this;
 
-    $('#playlists').removeClass('show');
+    $("#playlists").removeClass("show");
 
     $.ajax({
       url: String.format(self._options.getUserPlaylistsApi, user),
-      dataType: 'json'
-    })
-    .done(function(data) {
+      dataType: "json",
+    }).done(function (data) {
       self._playlists = data;
       self.renderPlaylists(data);
     });
@@ -251,13 +255,16 @@ export default class PlaylistPlayer {
   getUserPlaylistById(user, playlistId, callback) {
     var self = this;
 
-    $('#playlists').removeClass('show');
+    $("#playlists").removeClass("show");
 
     $.ajax({
-      url: String.format(self._options.getUserPlaylistsByIdApi, user, playlistId),
-      dataType: 'json'
-    })
-    .done(function(data) {
+      url: String.format(
+        self._options.getUserPlaylistsByIdApi,
+        user,
+        playlistId
+      ),
+      dataType: "json",
+    }).done(function (data) {
       self._playlists = data;
       self._selectedPlaylist = playlistId;
 
@@ -275,20 +282,20 @@ export default class PlaylistPlayer {
   clickPlaylist(e, el) {
     var self = this;
 
-    $('#playlists .playing').removeClass('on');
-    $('#playlists img').removeClass('blur');
-    $(el).find('.playing').addClass('on');
-    $(el).find('img').addClass('blur');
+    $("#playlists .playing").removeClass("on");
+    $("#playlists img").removeClass("blur");
+    $(el).find(".playing").addClass("on");
+    $(el).find("img").addClass("blur");
 
     e.preventDefault(); // Prevent updating to index (#) route.
 
-    self._selectedPlaylist = $(el).data('playlist');
+    self._selectedPlaylist = $(el).data("playlist");
     self.loadPlaylistByName(self._selectedPlaylist);
-    $('.js-spinner').text('Loading playlist...');
+    $(".js-spinner").text("Loading playlist...");
     window.scrollTo(0, 0);
 
     if (!window._isCasting) {
-      $('#casting').slideUp();
+      $("#casting").slideUp();
     }
   }
 
@@ -302,35 +309,43 @@ export default class PlaylistPlayer {
   loadPlaylistByName(playlistName) {
     var self = this;
 
-    var playlist = _.find(self._playlists.data, function(p) {
-      return p.name == playlistName
-    }) || self._playlists.data;
+    var playlist =
+      _.find(self._playlists.data, function (p) {
+        return p.name == playlistName;
+      }) || self._playlists.data;
     self.loadPlaylist(playlist);
   }
 
   loadPlaylist(playlist) {
     var self = this;
 
-    var url = String.format(self._options.getPlaylistTracksByIdApi,
-      playlist.owner.id, playlist.id);
+    var url = String.format(
+      self._options.getPlaylistTracksByIdApi,
+      playlist.owner.id,
+      playlist.id
+    );
 
-      $.ajax({
-        url: url,
-        dataType: 'json'
-      })
-      .done(function(data) {
-        self._currentPlaylist = self.buildVideosArray(data);
+    $.ajax({
+      url: url,
+      dataType: "json",
+    }).done(function (data) {
+      self._currentPlaylist = self.buildVideosArray(data);
 
-        if (window._isCasting) {
-          self.updateCast();
-          $('.js-spinner').empty();
-        } else {
-          self._player.loadPlaylist(self._currentPlaylist, 0, 5, self._options.player.quality);
-          $('.js-spinner').empty();
-          $('#player').slideDown();
-          $('.player-controls').slideDown();
-        }
-      });
+      if (window._isCasting) {
+        self.updateCast();
+        $(".js-spinner").empty();
+      } else {
+        self._player.loadPlaylist(
+          self._currentPlaylist,
+          0,
+          5,
+          self._options.player.quality
+        );
+        $(".js-spinner").empty();
+        $("#player").slideDown();
+        $(".player-controls").slideDown();
+      }
+    });
   }
 
   renderPlaylists(data) {
@@ -339,16 +354,16 @@ export default class PlaylistPlayer {
 
     $.ajax({
       url: self._options.playlistTemplate,
-      dataType: 'html'
-    })
-    .done(function(tmpl) {
-
+      dataType: "html",
+    }).done(function (tmpl) {
       var playlistTmpl = _.template(tmpl);
 
-      $('#playlists')
-      .html(playlistTmpl({data: playlistData}))
-      .addClass('show');
-      $('.js-playlist').on('click', function(e, el) { self.clickPlaylist(e, this) });
+      $("#playlists")
+        .html(playlistTmpl({ data: playlistData }))
+        .addClass("show");
+      $(".js-playlist").on("click", function (e, el) {
+        self.clickPlaylist(e, this);
+      });
     });
   }
 
@@ -357,20 +372,16 @@ export default class PlaylistPlayer {
 
     $.ajax({
       url: self._options.userPlaylistTemplate,
-      dataType: 'html'
-    })
-    .done(function(tmpl) {
-
+      dataType: "html",
+    }).done(function (tmpl) {
       var userPlaylistTmpl = _.template(tmpl);
 
-      $('#playlists')
-      .html(userPlaylistTmpl)
-      .addClass('show');
+      $("#playlists").html(userPlaylistTmpl).addClass("show");
 
-      $('#user-form').on('submit', function(e) {
+      $("#user-form").on("submit", function (e) {
         e.preventDefault();
 
-        var user = $('#user-input').val();
+        var user = $("#user-input").val();
         window.location.hash = `/playlist/${user}`;
       });
     });
@@ -382,15 +393,13 @@ export default class PlaylistPlayer {
 
     $.ajax({
       url: self._options.categoriesTemplate,
-      dataType: 'html'
-    })
-    .done(function(tmpl) {
-
+      dataType: "html",
+    }).done(function (tmpl) {
       var categoriesTmpl = _.template(tmpl);
 
-      $('#playlists')
-      .html(categoriesTmpl({data: categoriesData}))
-      .addClass('show');
+      $("#playlists")
+        .html(categoriesTmpl({ data: categoriesData }))
+        .addClass("show");
     });
   }
 
@@ -401,39 +410,38 @@ export default class PlaylistPlayer {
   }
 
   youTubeLoadPlayer() {
-
     var self = this;
     // Setup ready event callback for YouTube iframe API.
-    window.onYouTubeIframeAPIReady = function() { self.youTube_IframeAPIReady(self._options); };
+    window.onYouTubeIframeAPIReady = function () {
+      self.youTube_IframeAPIReady(self._options);
+    };
 
     // Load the YouTube Iframe API.
-    var $script = $('<script />', {
-      src: 'https://www.youtube.com/iframe_api'
+    var $script = $("<script />", {
+      src: "https://www.youtube.com/iframe_api",
     });
 
-    $('script')
-    .first()
-    .before($script)
-    ;
+    $("script").first().before($script);
   }
 
   youTube_IframeAPIReady(options) {
     var self = this;
 
-    window._player = new YT.Player('player', {
-
+    window._player = new YT.Player("player", {
       playerVars: {
-        autohide:     options.player.autohide,
-        autoplay:     0,
+        autohide: options.player.autohide,
+        autoplay: 0,
         iv_load_policy: 3,
         modestbranding: 0,
-        showinfo:   1
+        showinfo: 1,
       },
 
       events: {
-        'onReady':       function() { self.player_Ready() },
-        'onStateChange':   this.player_StateChange
-      }
+        onReady: function () {
+          self.player_Ready();
+        },
+        onStateChange: this.player_StateChange,
+      },
     });
   }
 }
