@@ -5,23 +5,22 @@ var entry = './app/web/src/app/main.js',
   };
 
 module.exports.development = {
-    debug : true,
-    devtool : 'eval',
     entry: entry,
     output: output,
+    mode: 'development',
     module : {
-        loaders : [
+        rules : [
             { test: /\.js?$/, exclude: /node_modules/, loader: 'babel-loader' }
         ]
     }
 };
 
 module.exports.production = {
-    debug: false,
     entry: entry,
     output: output,
+    mode: 'production',
     module : {
-        loaders : [
+        rules : [
             { test: /\.js?$/, exclude: /node_modules/, loader: 'babel-loader' }
         ]
     }

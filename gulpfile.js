@@ -1,58 +1,46 @@
-var gulp = require('gulp');
-var path = require('path');
-var $ = require('gulp-load-plugins')();
-var del = require('del');
+const gulp = require('gulp');
+const path = require('path');
+const $ = require('gulp-load-plugins')();
+const webpack = require('webpack-stream');
+const del = require('del');
 
-var environment = $.util.env.type || 'development';
-var isProduction = environment === 'production';
-var webpackConfig = require('./webpack.config.js')[environment];
+const environment = $.util.env.type || 'development';
+const isProduction = environment === 'production';
+const webpackConfig = require('./webpack.config.js')[environment];
 
-var port = $.util.env.port || 1337;
-var src = 'app/web/src/';
-var dist = 'app/web/dist/';
+const port = $.util.env.port || 1337;
+const src = 'app/web/src/';
+const dist = 'app/web/dist/';
 
-var autoprefixerBrowsers = [
-  'ie >= 9',
-  'ie_mob >= 10',
-  'ff >= 30',
-  'chrome >= 34',
-  'safari >= 6',
-  'opera >= 23',
-  'ios >= 6',
-  'android >= 4.4',
-  'bb >= 10'
-];
-
-gulp.task('scripts', function() {
+gulp.task('scripts', () => {
   return gulp.src(webpackConfig.entry)
-    .pipe($.webpack(webpackConfig))
+    .pipe(webpack(webpackConfig))
     .pipe(isProduction ? $.uglifyjs() : $.util.noop())
     .pipe(gulp.dest(dist + 'js/'))
     .pipe($.size({ title : 'js' }))
     .pipe($.connect.reload());
 });
 
-gulp.task('html', function() {
+gulp.task('html', () => {
   return gulp.src(src + 'index.html')
     .pipe(gulp.dest(dist))
     .pipe($.size({ title : 'html' }))
     .pipe($.connect.reload());
 });
 
-gulp.task('styles',function(cb) {
+gulp.task('styles', () => {
   return gulp.src(src + 'stylus/main.styl')
     .pipe($.stylus({
       compress: isProduction,
       'include css' : true
     }))
-    .pipe($.autoprefixer({browsers: autoprefixerBrowsers}))
+    .pipe($.autoprefixer())
     .pipe(gulp.dest(dist + 'css/'))
     .pipe($.size({ title : 'css' }))
     .pipe($.connect.reload());
-
 });
 
-gulp.task('serve', function() {
+gulp.task('serve', () => {
   $.connect.server({
     root: dist,
     port: port,
@@ -62,26 +50,21 @@ gulp.task('serve', function() {
   });
 });
 
-gulp.task('static', function(cb) {
+gulp.task('static', () => {
   return gulp.src(src + 'static/**/*')
     .pipe($.size({ title : 'static' }))
     .pipe(gulp.dest(dist + 'static/'));
 });
 
-gulp.task('watch', function() {
+gulp.task('watch', () => {
   gulp.watch(src + 'stylus/*.styl', ['styles']);
   gulp.watch(src + 'index.html', ['html']);
   gulp.watch(src + 'app/**/*.js', ['scripts']);
 });
 
-gulp.task('clean', function(cb) {
+gulp.task('clean', (cb) => {
   del([dist], cb);
 });
 
-// by default build project and then watch files in order to trigger livereload
-gulp.task('default', ['build', 'serve', 'watch']);
-
-// waits until clean is finished then builds the project
-gulp.task('build', ['clean'], function(){
-  gulp.start(['static', 'scripts', 'styles']);
-});
+gulp.task('build', gulp.series(['clean', 'static', 'scripts', 'styles']));
+gulp.task('default', gulp.series(['build', 'serve', 'watch']));
