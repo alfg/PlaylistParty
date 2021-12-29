@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
 /*
- * SpotlistTV.
+ * PlaylistParty.
  * WebApp to convert Spotify Playlists to Youtube Playlists.
  * Powered by NodeJS and Express.js.
  *
  * Copyright (c) 2015 Alfred Gutierrez alfg.co.
  *
  * Project home:
- *   https://github.com/alfg/spotlistTV
+ *   https://github.com/alfg/PlaylistParty
  */
 
 // Import application and set port.

@@ -1,12 +1,12 @@
-# SpotlistTV
+# PlaylistParty
 
 Play Spotify Playlists on Youtube. Now with Google Cast!
 
 Built with NodeJS, Express, Backbone, and ES6.
 
-* https://spotlist-tv.herokuapp.com
+* https://playlistparty.tv
 
-![Spotlist.TV](screenshot.png)
+![PlaylistParty](screenshot.png)
 
 
 ## Development
@@ -19,8 +19,8 @@ Built with NodeJS, Express, Backbone, and ES6.
 #### Clone and install dependencies
 
 ```bash
-$ git clone https://github.com/alfg/spotlistTV.git
-$ cd spotlistTV
+$ git clone https://github.com/alfg/PlaylistParty.git
+$ cd PlaylistParty
 $ npm install
 ```
 

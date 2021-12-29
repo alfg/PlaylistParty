@@ -1,7 +1,7 @@
 {
-  "name": "spotlist-tv",
-  "version": "0.2.0",
-  "description": "Spotify to YouTube Playlists.",
+  "name": "playlist-party",
+  "version": "0.3.0",
+  "description": "Play Spotify Playlists on YouTube!",
   "main": "server.js",
   "scripts": {
     "start": "./node_modules/.bin/gulp build && node server.js",
