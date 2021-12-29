@@ -8,13 +8,11 @@ Built with NodeJS, Express, Backbone, and ES6.
 
 ![PlaylistParty](screenshot.png)
 
-
 ## Development
+SpotlistTV is built with NodeJS 14+, Express, Backbone.
 
-#### Register API Keys
+#### Register API Key
 - https://developer.spotify.com/
-- https://developers.google.com/youtube/v3/getting-started
-
 
 #### Clone and install dependencies
 
@@ -30,7 +28,6 @@ Open `config.js` and configure or set environment variables
 client_id: '<key>',  // Spotify API key.
 client_secret: '<secret>',  // Spotify Secret Key.
 redirect_uri: 'http://localhost:3000/callback',  // Spotify redirect URI.
-googleApiKey: '<google api key>',  // Google API Key.
 castApplicationId: '<cast application id>', // Cast App ID. See Chromecast below.
 castNamespace: '<cast namespace>' // Cast namespace. See Chromecast below.
 ```
@@ -64,5 +61,4 @@ https://developers.google.com/cast/docs/developers
 *If you wish to use my hosted receiver, feel free to leave the config as the defaults.*
 
 ## License
-
-[MIT License](http://alfg.mit-license.org/) © Alfred Gutierrez
+MIT
