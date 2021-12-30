@@ -4,9 +4,9 @@ Play Spotify Playlists on Youtube. Now with Google Cast!
 
 Built with NodeJS, Express, Backbone, and ES6.
 
-* https://playlistparty.tv
+https://playlistparty.tv
 
-![PlaylistParty](screenshot.png)
+![screenshot](https://user-images.githubusercontent.com/702541/147712490-c9611f85-9cec-4fdc-a662-40c46812b1a3.png)
 
 ## Development
 SpotlistTV is built with NodeJS 14+, Express, Backbone.
