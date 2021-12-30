@@ -18,7 +18,7 @@ SpotifyService.prototype.getAuth = function(callback) {
     var authOptions = {
         url: 'https://accounts.spotify.com/api/token',
         headers: {
-            'Authorization': 'Basic ' + (new Buffer(config.client_id + ':' + config.client_secret).toString('base64'))
+            'Authorization': 'Basic ' + (new Buffer.from(config.client_id + ':' + config.client_secret).toString('base64'))
         },
         form: {
             grant_type: 'client_credentials'

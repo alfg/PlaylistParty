@@ -1,16 +1,9 @@
 var express = require('express');
-var config = require('../../config');
-var cache = require('../cache');
+var config = require('../config');
+var cache = require('./cache');
 var router = express.Router();
 
-var Spotify = require('../spotify');
-
-/**
- * Homepage demo.
- */
-router.get('/', function(req, res) {
-	res.json({ data: 'Hello World!'});
-});
+var Spotify = require('./spotify');
 
 router.get('/categories', function(req, res) {
 

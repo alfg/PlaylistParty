@@ -4,7 +4,7 @@ var morgan = require('morgan');
 var request = require('request');
 
 var config = require('../config');
-var routes = require('./api/routes');
+var api = require('./api');
 var web = require('./web/controllers/index');
 var cache = require('./cache');
 
@@ -21,7 +21,7 @@ app.use(express.static(path.join(__dirname, 'web/dist')));
 app.use('/', web);
 
 // register api v1 routes
-app.use('/api', routes.index);
+app.use('/api', api);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
