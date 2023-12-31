@@ -4,7 +4,7 @@ Play Spotify Playlists on Youtube. Now with Google Cast!
 
 Built with NodeJS, Express, Backbone, and ES6.
 
-https://playlistparty.tv
+[https://playlistparty.tv](https://playlistparty.alfg.dev/)
 
 ![screenshot](https://user-images.githubusercontent.com/702541/147712490-c9611f85-9cec-4fdc-a662-40c46812b1a3.png)
 
